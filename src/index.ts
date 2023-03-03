@@ -1,4 +1,6 @@
 import {app} from './app';
-import { port } from './env';
+import { PORT } from './env';
 
-app.listen(port,()=>{console.log("app is running o port"+ " "+port)})
+app.listen(PORT, () => {
+    console.log(`Server listening on PORT ${PORT}`)
+})
