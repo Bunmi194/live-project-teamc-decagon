@@ -62,6 +62,8 @@ export const signUp = async (req: Request, res: Response) => {
         gender,
         isVerified: false,
     };
+
+    
     //write the new user to the database
     const User = await writeUserToDatabase(newUser);
 
