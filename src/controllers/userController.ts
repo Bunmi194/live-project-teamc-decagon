@@ -3,6 +3,8 @@ import { check, validationResult } from 'express-validator';
 import sendMail from "../services/emailService";
 import { JWT_SECRET } from "../env";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+
 import { doesUserExist,
     writeUserToDatabase,
     updateUserRecordWithEmail
@@ -50,11 +52,12 @@ export const signUp = async (req: Request, res: Response) => {
     if (userExists) {
         return res.status(400).json({ errors: [{ msg: 'User already exists' }] });
     }
+    const hashedPassword = await bcrypt.hashSync(password, 10);
     const newUser = {
         firstName,
         lastName,
         email,
-        password,
+        password: hashedPassword,
         dateOfBirth,
         gender,
         isVerified: false,
@@ -116,7 +119,5 @@ export const verifyEmail = async (req: Request, res: Response) => {
         return res.status(500).json({message: "Please try again"});
     }
     return res.status(200).json({ message: 'Account verified' });
-    
-    
 
 }
