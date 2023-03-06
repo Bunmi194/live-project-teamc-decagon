@@ -1,4 +1,9 @@
-import {app} from './app';
-import { port } from './env';
+import { app } from "./app";
+import { PORT } from "./env";
+import databaseConnection from "./config/config";
 
-app.listen(port,()=>{console.log("app is running o port"+ " "+port)})
+databaseConnection();
+console.log("PORT: ", PORT)
+app.listen(PORT, () => {
+  console.log(`Server listening on PORT ${PORT}`);
+});

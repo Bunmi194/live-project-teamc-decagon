@@ -1,12 +1,20 @@
-import dotenv from 'dotenv';
-
+import dotenv from "dotenv";
 dotenv.config();
 
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
-const jwt_secret = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET;
 
-export{
-port,
-jwt_secret
-}
+const DB_URI = process.env.DB_URI;
+
+const EMAIL = process.env.EMAIL;
+
+const PASSWORD = process.env.PASSWORD;
+
+const SALT = process.env.SALT;
+
+const URL = process.env.VERIFYURL;
+
+console.log("PORT1: ", PORT);
+console.log("ENV: ", PORT, JWT_SECRET, DB_URI, EMAIL, PASSWORD, SALT, URL);
+export { PORT, JWT_SECRET, DB_URI, EMAIL, PASSWORD, SALT, URL };

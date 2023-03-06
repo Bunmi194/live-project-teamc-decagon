@@ -4,7 +4,7 @@
   "description": "E-Move",
   "main": "index.js",
   "scripts": {
-    "start": "node ./dist",
+    "start": "nodemon ./dist",
     "compile": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,16 +19,20 @@
   },
   "homepage": "https://github.com/decadevs/live-project-backend-teamc#readme",
   "dependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/nodemailer": "^6.4.7",
     "bcrypt": "^5.1.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-validator": "^6.15.0",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^7.0.0"
-  
+    "mongoose": "^7.0.0",
+    "nodemailer": "^6.9.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.17",
-    "morgan": "^1.10.0"
+    "@types/jsonwebtoken": "^9.0.1",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.21"
   }
 }
