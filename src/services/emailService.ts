@@ -1,9 +1,9 @@
 import nodemailer from 'nodemailer';
 import jwt from "jsonwebtoken";
-import { JWT_SECRET, EMAIL, PASSWORD } from "../env";
+import { JWT_SECRET, EMAIL, PASSWORD, URL } from "../env";
 
-const userName = EMAIL || "";
-const password = PASSWORD || "";
+const userName = EMAIL;
+const password = PASSWORD;
 const secret = JWT_SECRET as string;
 
 const transporter = nodemailer.createTransport({
@@ -19,7 +19,6 @@ const transporter = nodemailer.createTransport({
 
 //please use the url for user authentication
 //add JWT token
-const url = "http://localhost:3030/v1/verify/";
 
 
 const sendMail = (email: string) =>{
@@ -30,7 +29,7 @@ const sendMail = (email: string) =>{
         to: email,
         subject: "E-move Account Verification",
         text: `Please click on the link below to verify your account`,
-        html: `<b>Please click on the link below to verify your account</b><br/>${url}${token}
+        html: `<b>Please click on the link below to verify your account</b><br/>${URL}${token}
         `
     }
     transporter.sendMail(mailOptions, function (error, info) {

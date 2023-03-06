@@ -1,23 +1,20 @@
-// import dotenv from 'dotenv';
-import { request } from 'express';
-// dotenv.config();
+import dotenv from "dotenv";
+dotenv.config();
 
-const PORT = process.env.PORT || 3030;
+const PORT = process.env.PORT;
 
-const JWT_SECRET = process.env.JWT_SECRET || "$2b$10$jkTyLUfdeZ3xb9gI0HWaw.o2ZYHcPCfEM24sTdkTyt3tEc2uTrrcy";
+const JWT_SECRET = process.env.JWT_SECRET;
 
-const DB_URI = process.env.DB_URI || "mongodb+srv://emove:Emove123456789$$@emove.zjqzcfx.mongodb.net/?retryWrites=true&w=majority";
+const DB_URI = process.env.DB_URI;
 
-const EMAIL = process.env.EMAIL || "emove.teamc@gmail.com";
+const EMAIL = process.env.EMAIL;
 
-const PASSWORD = process.env.PASSWORD || "zooexyymyasruxbx";
+const PASSWORD = process.env.PASSWORD;
 
-// console.log('Here: ', DB_URI)
-// console.log('EMAIL: ', EMAIL)
-export{
-    PORT,
-    JWT_SECRET,
-    DB_URI,
-    EMAIL,
-    PASSWORD
-}
+const SALT = process.env.SALT;
+
+const URL = process.env.VERIFYURL;
+
+console.log("PORT1: ", PORT);
+console.log("ENV: ", PORT, JWT_SECRET, DB_URI, EMAIL, PASSWORD, SALT, URL);
+export { PORT, JWT_SECRET, DB_URI, EMAIL, PASSWORD, SALT, URL };
