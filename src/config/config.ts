@@ -5,7 +5,6 @@ import { DB_URI } from "../env";
 const connectionString = DB_URI || "";
 const PORT = process.env.PORT || 3030;
 
-console.log("connectionString: ",connectionString)
 const databaseConnection = () => {
     mongoose.connect(connectionString)
     .then(() => {       

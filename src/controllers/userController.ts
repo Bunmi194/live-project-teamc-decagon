@@ -33,6 +33,7 @@ interface UserDataType {
 }
 
 const secret = JWT_SECRET as string;
+const salt = process.env.SALT || 10;
 
 export const signUp = async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -52,7 +53,7 @@ export const signUp = async (req: Request, res: Response) => {
     if (userExists) {
         return res.status(400).json({ errors: [{ msg: 'User already exists' }] });
     }
-    const hashedPassword = await bcrypt.hashSync(password, 10);
+    const hashedPassword = await bcrypt.hashSync(password, salt);
     const newUser = {
         firstName,
         lastName,
