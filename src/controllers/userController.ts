@@ -116,3 +116,26 @@ export const verifyEmail = async (req: Request, res: Response) => {
   }
   return res.status(200).json({ message: "Account verified" });
 };
+
+
+// Login
+export const login = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  const user = (await doesUserExist(email)) as UserDataType;
+  if (!user) {
+    return res.status(400).json({ message: "Invalid email address" });
+  }
+ 
+  const isMatch =  bcrypt.compareSync(password, user.password!);
+  console.log(isMatch)
+  if (!isMatch) {
+    return res.status(400).json({ message: "Invalid password" });
+  }
+  if (!user.isVerified) {
+    return res.status(400).json({ message: "Please verify your email" });
+  }
+  const token = jwt.sign({ email: user.email }, secret, { expiresIn: "1h" });
+  return res.status(200).json({ token });
+}
+
+
