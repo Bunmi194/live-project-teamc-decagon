@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import sendMail from "../services/emailService";
+import { sendMail, sendMailMod } from "../services/emailService";
 import { JWT_SECRET, SALT } from "../env";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -115,4 +115,79 @@ export const verifyEmail = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Please try again" });
   }
   return res.status(200).json({ message: "Account verified" });
+};
+
+
+export const forgotPassword = async (req: Request, res: Response) => {
+  const { email } = req.body;
+  const user = await doesUserExist(email);
+  if (!user) {
+    return res
+      .status(400)
+      .json({ message: `User with email: ${email} doesn't exist` });
+  }
+  const messageData = {
+    subject: "E-move Reset Password",
+    text: `Please click on the link below to reset your password`,
+    html: `<b>Please click on the link below to reset your password </b><br/>
+        `,
+  };
+  try {
+    sendMailMod(email, messageData);
+    return res.status(200).json({
+      message: "Reset password email sent",
+      success: true,
+    });
+  } catch (err) {
+    return res.status(400).json({
+      message: "Reset password email could not be sent",
+      success: false,
+    });
+  }
+};
+
+export const resetpassword = async (req: Request, res: Response) => {
+  
+  const { password, confirmPassword } = req.body;
+  const { token } = req.params;
+
+  if (password !== confirmPassword) {
+    return res.status(400).json({ message: "Password and confirm password are not the same" }); 
+  }
+
+  const verifyToken = jwt.verify(token, secret) as string;
+  if (!verifyToken) {
+    return res.status(400).json({ message: "Invalid token" });
+  }
+  
+    const user = (await doesUserExist(verifyToken)) as UserDataType;
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email address" });
+    }
+
+    const hashedNewPassword = await bcrypt.hashSync(
+      password,
+      Number(`${SALT}`)
+    );
+
+    const newUserInfo = {
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      password: hashedNewPassword,
+      //password: password,
+      dateOfBirth: user.dateOfBirth,
+      gender: user.gender,
+      isVerified: user.isVerified,
+    };
+
+    const updateUser = updateUserRecordWithEmail(verifyToken, newUserInfo);
+
+    if (!updateUser) {
+      //please retry
+      return res.status(500).json({ message: "Please try again" });
+    }
+    return res.status(200).json({ message: "Password changed" });
+  
 };
