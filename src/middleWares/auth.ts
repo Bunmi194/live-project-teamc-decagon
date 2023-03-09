@@ -41,3 +41,13 @@ export const changePasswordAuth = {
     check("confirmPassword", "Confirm password is required").not().isEmpty(),
   ],
 };
+
+export const loginAuth = {  
+  body: [ 
+    check("email", "Email is required").not().isEmpty().isEmail(),
+    check("password", "Password is required and must be more than 5 characters")
+      .not() 
+      .isEmpty()
+      .isLength({ min: 6 }),
+  ], 
+};
