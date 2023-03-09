@@ -14,6 +14,34 @@ export const signUpAuth = {
   ],
 };
 
+export const changePasswordAuth = {
+  body: [
+    check("email", "Email is required").not().isEmpty().isEmail(),
+    check("password", "Password is required and must be more than 5 characters")
+      .not()
+      .isEmpty()
+      .isLength({ min: 6 }),
+    check(
+      "newPassword",
+      "New password is required and must be more than 5 characters"
+    )
+      .custom((value, { req }) => {
+        if (value !== req.body.confirmPassword) {
+          throw new Error("Password confirmation does not match password");
+        }
+        return true;
+      })
+      .custom((value, { req }) => {
+        if (value === req.body.password) {
+          throw new Error("New password cannot be the same as old password");
+        }
+        return true;
+      }),
+    ,
+    check("confirmPassword", "Confirm password is required").not().isEmpty(),
+  ],
+};
+
 export const loginAuth = {  
   body: [ 
     check("email", "Email is required").not().isEmpty().isEmail(),
@@ -23,4 +51,3 @@ export const loginAuth = {
       .isLength({ min: 6 }),
   ], 
 };
-
