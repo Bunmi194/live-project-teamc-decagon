@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { sendMail, sendMailMod } from "../services/emailService";
+import {sendMail, sendMailMod} from "../services/emailService";
 import { JWT_SECRET, SALT } from "../env";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import User from "../models/userModel";
 
 import {
   doesUserExist,
@@ -115,8 +116,84 @@ export const verifyEmail = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Please try again" });
   }
   return res.status(200).json({ message: "Account verified" });
+
+  //change password
+  //change password
+};
+export const changePassword = async (req: Request, res: Response) => {
+  try {
+    //get password from request body
+    const { password, newPassword, confirmPassword } = req.body;
+    //hashed password
+    const hashedPassword = await bcrypt.hashSync(
+      newPassword,
+      Number(`${SALT}`)
+    );
+    //check if user exists
+    const userExists = (await doesUserExist(req.body.email)) as UserDataType;
+    if (!userExists) {
+      return res.status(400).json({ errors: [{ msg: "User does not exist" }] });
+    }
+
+    //check if password is correct
+    // const isPasswordCorrect = bcrypt.compareSync(
+    //   password,
+    //   userExists.password!
+    // );
+    console.log("what is happening");
+    if (password !== userExists.password) {
+      return res
+        .status(400)
+        .json({ errors: [{ msg: "Old password is incorrect" }] });
+    }
+    //check if new password and confirm password match
+    if (newPassword !== confirmPassword) {
+      return res
+        .status(400)
+        .json({ errors: [{ msg: "Passwords do not match" }] });
+    }
+    const newUser = {
+      _id: userExists._id,
+      firstName: userExists.firstName,
+      lastName: userExists.lastName,
+      email: userExists.email,
+      password: hashedPassword,
+      dateOfBirth: userExists.dateOfBirth,
+      gender: userExists.gender,
+      isVerified: userExists.isVerified,
+    };
+
+    const updateUser = updateUserRecordWithEmail(userExists.email!, newUser);
+    if (!updateUser) {
+      //please retry
+      return res.status(500).json({ message: "Please try again" });
+    }
+    return res.status(200).json({ message: "Password changed" });
+  } catch (error) {
+    return res.status(500).json({ errors: [{ msg: "Server error" }] });
+  }
 };
 
+
+// Login
+export const login = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  const user = (await doesUserExist(email)) as UserDataType;
+  if (!user) {
+    return res.status(400).json({ message: "Invalid email address" });
+  }
+ 
+  const isMatch =  bcrypt.compareSync(password, user.password!);
+  console.log(isMatch)
+  if (!isMatch) {
+    return res.status(400).json({ message: "Invalid password" });
+  }
+  if (!user.isVerified) {
+    return res.status(400).json({ message: "Please verify your email" });
+  }
+  const token = jwt.sign({ email: user.email }, secret, { expiresIn: "1h" });
+  return res.status(200).json({ token });
+}
 
 export const forgotPassword = async (req: Request, res: Response) => {
   const { email } = req.body;
