@@ -29,6 +29,10 @@ const userSchema = new Schema({
     type: "boolean",
     required: true,
   },
+  roles: {
+    type: [],
+    required: true
+  }
 });
 
 const User = mongoose.model("User", userSchema);

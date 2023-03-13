@@ -13,8 +13,10 @@ const PASSWORD = process.env.PASSWORD;
 
 const SALT = process.env.SALT;
 
-const URL = process.env.VERIFYURL;
+const VERIFYURL = process.env.VERIFYURL;
+
+const RESETURL = process.env.RESETURL
 
 console.log("PORT1: ", PORT);
-console.log("ENV: ", PORT, JWT_SECRET, DB_URI, EMAIL, PASSWORD, SALT, URL);
-export { PORT, JWT_SECRET, DB_URI, EMAIL, PASSWORD, SALT, URL };
+console.log("ENV: ", PORT, JWT_SECRET, DB_URI, EMAIL, PASSWORD, SALT, VERIFYURL);
+export { PORT, JWT_SECRET, DB_URI, EMAIL, PASSWORD, SALT, VERIFYURL , RESETURL};
