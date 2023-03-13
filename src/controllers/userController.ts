@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import {sendMail, sendMailMod} from "../services/emailService";
-import { JWT_SECRET, SALT } from "../env";
+import {sendMail} from "../services/emailService";
+import { JWT_SECRET, SALT, EMAIL, PASSWORD, VERIFYURL, RESETURL } from "../env";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import User from "../models/userModel";
@@ -67,10 +67,20 @@ export const signUp = async (req: Request, res: Response) => {
       .json({ errors: [{ msg: "User could not be created" }] });
   }
 
+  const token = jwt.sign(email, secret);
+   const messageData = {
+        from: "E-move App",
+        to: email,
+        subject: "E-move Account Verification",
+        text: `Please click on the link below to verify your account`,
+        html: `<b>Please click on the link below to verify your account</b><br/>${VERIFYURL}${token}
+        `
+  }
+
   //user created successfully
   //send email notification
   try {
-    sendMail(email);
+    sendMail(email, messageData);
     return res.status(201).json({
       User,
       message: "User created successfully",
@@ -203,14 +213,15 @@ export const forgotPassword = async (req: Request, res: Response) => {
       .status(400)
       .json({ message: `User with email: ${email} doesn't exist` });
   }
+  const token = jwt.sign(email, secret);
   const messageData = {
     subject: "E-move Reset Password",
     text: `Please click on the link below to reset your password`,
     html: `<b>Please click on the link below to reset your password </b><br/>
-        `,
+        ${RESETURL}${token}`,
   };
   try {
-    sendMailMod(email, messageData);
+    sendMail(email, messageData);
     return res.status(200).json({
       message: "Reset password email sent",
       success: true,
