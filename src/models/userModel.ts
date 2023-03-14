@@ -31,7 +31,8 @@ const userSchema = new Schema({
   },
   roles: {
     type: [],
-    required: true
+    required: true,
+    default: ['passenger']
   }
 });
 

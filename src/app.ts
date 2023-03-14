@@ -1,5 +1,6 @@
 import express from 'express';
 import { route  as userRouter } from './routes/userRoutes';
+import { route  as routeRouter } from './routes/routeRoutes';
 // import mongoose, { ConnectOptions } from "mongoose";
 import dotenv from "dotenv";
 import morgan from "morgan";
@@ -21,5 +22,6 @@ app.use(morgan('combined'));
 //databaseConnection();
 
 app.use("/", userRouter);
+// app.use("/v1/route", routeRouter);
 
 export { app };
