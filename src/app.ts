@@ -21,7 +21,7 @@ app.use(morgan('combined'));
 
 //databaseConnection();
 
-app.use("/", userRouter);
-// app.use("/v1/route", routeRouter);
+app.use("/v1/users", userRouter);
+app.use("/v1/routes", routeRouter);
 
 export { app };

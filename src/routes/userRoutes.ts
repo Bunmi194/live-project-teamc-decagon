@@ -9,19 +9,19 @@ const route = Router();
 
 route.get("/", defaultController);
 
-route.post("/v1/signup", signUpAuth.body, signUp);
+route.post("/signup", signUpAuth.body, signUp);
 
-route.post("/v1/login", loginAuth.body, login);
+route.post("/login", loginAuth.body, login);
 
-route.get("/v1/verify/:token", verifyEmail);
+route.get("/verify/:token", verifyEmail);
 
-route.post("/v1/forgotpassword", forgotPasswordAuth.body, forgotPassword)
+route.post("/forgotpassword", forgotPasswordAuth.body, forgotPassword)
 
-route.post("/v1/resetpassword/:token", resetPasswordAuth.body, resetpassword);
-route.post("/v1/change-password", changePassword);
+route.post("/resetpassword/:token", resetPasswordAuth.body, resetpassword);
+route.post("/change-password", changePassword);
 
 //routes for bus route
-route.post("/v1/route", routeAuth.body, adminAuthentication, addRoute);
-route.post("/v1/route/edit", editRouteAuth.body, adminAuthentication, editRoute);
+// route.post("/v1/route", routeAuth.body, adminAuthentication, addRoute);
+// route.post("/v1/route/edit", editRouteAuth.body, adminAuthentication, editRoute);
 
 export { route };
