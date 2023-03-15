@@ -44,6 +44,7 @@ export const signUp = async (req: Request, res: Response) => {
     req.body;
   //check if user exists
   const userExists = await doesUserExist(email);
+  console.log("userExists: ", userExists)
   if (userExists) {
     return res.status(400).json({ errors: [{ msg: "User already exists" }] });
   }
@@ -105,7 +106,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
   if (!verifyToken) {
     return res.status(400).json({ message: "Invalid token" });
   }
-  const user = (await doesUserExist(verifyToken)) as UserDataType;
+  const user = (await doesUserExist(verifyToken)) as unknown as UserDataType;
   if (!user) {
     return res.status(400).json({ message: "Invalid email address" });
   }
@@ -130,6 +131,8 @@ export const verifyEmail = async (req: Request, res: Response) => {
   //change password
   //change password
 };
+
+
 export const changePassword = async (req: Request, res: Response) => {
   try {
     //get password from request body
@@ -140,7 +143,7 @@ export const changePassword = async (req: Request, res: Response) => {
       Number(`${SALT}`)
     );
     //check if user exists
-    const userExists = (await doesUserExist(req.body.email)) as UserDataType;
+    const userExists = (await doesUserExist(req.body.email)) as unknown as UserDataType;
     if (!userExists) {
       return res.status(400).json({ errors: [{ msg: "User does not exist" }] });
     }
@@ -188,7 +191,7 @@ export const changePassword = async (req: Request, res: Response) => {
 // Login
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  const user = (await doesUserExist(email)) as UserDataType;
+  const user = (await doesUserExist(email)) as unknown as UserDataType;
   if (!user) {
     return res.status(400).json({ message: "Invalid email address" });
   }
@@ -248,7 +251,7 @@ export const resetpassword = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "Invalid token" });
   }
   
-    const user = (await doesUserExist(verifyToken)) as UserDataType;
+    const user = (await doesUserExist(verifyToken)) as unknown as UserDataType;
     if (!user) {
       return res.status(400).json({ message: "Invalid email address" });
     }

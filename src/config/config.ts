@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { DB_URI } from "../env";
+import jwt from "jsonwebtoken";
 
 const databaseConnection = () => {
   mongoose
@@ -7,8 +8,9 @@ const databaseConnection = () => {
     .then(() => {
       console.log(`Database connection established`);
     })
-    .catch(() => {
-      console.log("Could not connect to database");
+    .catch((err) => {
+      setTimeout(databaseConnection, 30000);
+      console.log("Could not connect to database: ", err);
     });
 
   mongoose.connection.on("connection", (connection: mongoose.Connection) => {
