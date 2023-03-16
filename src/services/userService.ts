@@ -18,25 +18,25 @@ export const doesUserExist = async (email: string) => {
   //   const user = User.findOne({ email: email }) as UserDataType;
   //   resolve(user);
   // });
-    return User.findOne({ email: email })
-    .then(data => {
+  return User.findOne({ email: email })
+    .then((data) => {
       return data;
     })
-    .catch(err => {
+    .catch((err) => {
       console.log("Error: ", err);
       return false;
-    })
+    });
 };
 //pass object to this function to find user
 export const findAnyUser = async (data: UserDataType) => {
-    return User.findOne(data)
-    .then(result => {
+  return User.findOne(data)
+    .then((result) => {
       return result;
     })
-    .catch(err => {
+    .catch((err) => {
       console.log("Error: ", err);
       return false;
-    })
+    });
 };
 //writing user to database
 
@@ -49,15 +49,16 @@ export const writeUserToDatabase = async (user: {}) => {
   //   console.log(error);
   //   return false;
   // }
-    const newUser = new User(user);
-      return newUser.save()
-      .then(data => {
-        return data;
-      })
-      .catch(err => {
-        console.log("Error: ", err);
-        return false;
-      })
+  const newUser = new User(user);
+  return newUser
+    .save()
+    .then((data) => {
+      return data;
+    })
+    .catch((err) => {
+      console.log("Error: ", err);
+      return false;
+    });
 };
 
 //update user record
@@ -76,4 +77,9 @@ export const updateUserRecordWithEmail = async (
     console.log(error);
     return false;
   }
+};
+
+export const getAllUsers = async () => {
+  const users = await User.find();
+  return users;
 };
