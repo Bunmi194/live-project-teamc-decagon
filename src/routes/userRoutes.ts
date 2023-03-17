@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { defaultController, login, signUp , forgotPassword, resetpassword} from "../controllers/userController";
-import { signUpAuth, loginAuth, forgotPasswordAuth, resetPasswordAuth  } from "../middleWares/auth";
+import { defaultController, login, signUp , forgotPassword, resetpassword, addDriver, editDriver} from "../controllers/userController";
+import { signUpAuth, loginAuth, forgotPasswordAuth, resetPasswordAuth, addDriverValidator  } from "../middleWares/auth";
 import { verifyEmail } from "../controllers/userController";
 import { changePassword } from "../controllers/userController";
+import { Upload } from "../middleWares/imageUpload";
 
 const route = Router();
 
@@ -18,5 +19,10 @@ route.post("/v1/forgotpassword", forgotPasswordAuth.body, forgotPassword)
 
 route.post("/v1/resetpassword/:token", resetPasswordAuth.body, resetpassword);
 route.post("/v1/change-password", changePassword);
+
+route.post("/v1/add-driver/:token",  addDriver )
+route.post("/v1/edit-driver/:id",  editDriver )
+
+//router.post("/", , Upload, createMemory);
 
 export { route };

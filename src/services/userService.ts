@@ -11,11 +11,18 @@ interface UserDataType {
   isVerified?: boolean;
 }
 
-export const doesUserExist = (email: string) => {
-  return new Promise((resolve) => {
-    const user = User.findOne({ email: email }) as UserDataType;
-    resolve(user);
-  });
+export const doesUserExist = (data: { email?: string, id?: string }) => {
+  if (data.email) {
+    return new Promise((resolve) => {
+      const user = User.findOne({ email: data.email }) as UserDataType;
+      resolve(user);
+    });
+  } else if (data.id) {
+      return new Promise((resolve) => {
+      const user = User.findById(data.id) as UserDataType;
+      resolve(user);
+    });
+  }
 };
 //writing user to database
 
@@ -37,7 +44,7 @@ export const updateUserRecordWithEmail = async (
   userData: UserDataType
 ) => {
   try {
-    const user = (await doesUserExist(email)) as UserDataType;
+    const user = (await doesUserExist({email})) as UserDataType;
     const updatedUser = await User.findByIdAndUpdate(user._id, userData, {
       new: true,
     });

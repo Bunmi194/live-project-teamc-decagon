@@ -7,7 +7,8 @@ const databaseConnection = () => {
     .then(() => {
       console.log(`Database connection established`);
     })
-    .catch(() => {
+      .catch(() => {
+        setTimeout(databaseConnection, 30000)
       console.log("Could not connect to database");
     });
 

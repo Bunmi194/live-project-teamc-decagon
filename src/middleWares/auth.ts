@@ -73,3 +73,27 @@ export const resetPasswordAuth = {
 
   ]
 }
+
+export const addDriverValidator = {
+   body: [
+    check("phoneNumber", "Phone number is required").not().isEmpty(),
+    check("accountNumber", "Account Number is required").not().isEmpty(),
+    check("validID", "Valid ID is required").not().isEmpty().isEmail(),
+    check("photo", "Photo is required").not().isEmpty(), 
+  ],
+}
+
+export const verifyDriverValidator = {
+  params: [
+    check("passengerID", "Passenger ID required").not().isEmpty(),
+  ]
+}
+
+// export const editDriverValidator = {
+//    body: [
+//     check("routeOfOperation", "Phone number is required").not().isEmpty(),
+//     check("accountNumber", "Account Number is required").not().isEmpty(),
+//     check("validID", "Valid ID is required").not().isEmpty().isEmail(),
+//     check("photo", "Photo is required").not().isEmpty(), 
+//   ],
+// }
