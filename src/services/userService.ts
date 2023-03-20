@@ -13,20 +13,20 @@ interface UserDataType {
   roles?: [string];
 }
 
-export const doesUserExist = async (email: string) => {
-  // return new Promise((resolve) => {
-  //   const user = User.findOne({ email: email }) as UserDataType;
-  //   resolve(user);
-  // });
-  return User.findOne({ email: email })
-    .then((data) => {
-      return data;
-    })
-    .catch((err) => {
-      console.log("Error: ", err);
-      return false;
+export const doesUserExist = (data: { email?: string, id?: string }) => {
+  if (data.email) {
+    return new Promise((resolve) => {
+      const user = User.findOne({ email: data.email }) as UserDataType;
+      resolve(user);
     });
-};
+  } else if (data.id) {
+      return new Promise((resolve) => {
+      const user = User.findById(data.id) as UserDataType;
+      resolve(user);
+    });
+  }
+}  
+
 //pass object to this function to find user
 export const findAnyUser = async (data: UserDataType) => {
   return User.findOne(data)
@@ -68,7 +68,7 @@ export const updateUserRecordWithEmail = async (
   userData: UserDataType
 ) => {
   try {
-    const user = (await doesUserExist(email)) as unknown as UserDataType;
+    const user = (await doesUserExist({email})) as UserDataType;
     const updatedUser = await User.findByIdAndUpdate(user._id, userData, {
       new: true,
     });
@@ -97,6 +97,7 @@ export const findDriver = async (id: string) => {
   }
   return driver;
 }
+
 export const deleteDriver = async (id: string) => {
   console.log(id)
     const user = await User.findByIdAndUpdate(id, {driverStatus: 'not started', $pop:{roles: 1}},{new: true});

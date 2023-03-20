@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { defaultController, login, signUp , forgotPassword, resetpassword, deleteDriverController} from "../controllers/userController";
-import { signUpAuth, loginAuth, forgotPasswordAuth, resetPasswordAuth, routeAuth, editRouteAuth, adminAuthentication  } from "../middleWares/auth";
+import { defaultController, login, signUp , forgotPassword, resetpassword, addDriver, editDriver, deleteDriverController} from "../controllers/userController";
+import { signUpAuth, loginAuth, forgotPasswordAuth, resetPasswordAuth, addDriverValidator, routeAuth, editRouteAuth, adminAuthentication  } from "../middleWares/auth";
 import { verifyEmail } from "../controllers/userController";
+import { Upload } from "../middleWares/imageUpload";
 import { changePassword , getAllDriversController, getOneDriverController} from "../controllers/userController";
 import { addRoute, editRoute } from "../controllers/routeController";
 
@@ -24,8 +25,9 @@ route.get('/drivers', getAllDriversController)
 route.get('/driver/:id', getOneDriverController)
 route.delete('/deleteDriver/:id', deleteDriverController)
 
-//routes for bus route
-// route.post("/v1/route", routeAuth.body, adminAuthentication, addRoute);
-// route.post("/v1/route/edit", editRouteAuth.body, adminAuthentication, editRoute);
+route.post("/v1/add-driver/:token",  addDriver )
+route.post("/v1/edit-driver/:id",  editDriver )
+
+//router.post("/", , Upload, createMemory);
 
 export { route };

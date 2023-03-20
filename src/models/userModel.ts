@@ -29,11 +29,42 @@ const userSchema = new Schema({
     type: "boolean",
     required: true,
   },
+  driverStatus: {
+    type: "string",
+    required: false,
+    enum: ['pending', 'verified', 'rejected', 'not started'],
+    default: 'not started'
+  },
   roles: {
     type: [],
     required: true,
-    default: ['passenger']
-  }
+    default: ["passenger"]
+  },
+  routeOfOperation: {
+    type: [],
+    required: false,
+  },
+  phoneNumber: {
+    type: "string",
+    required: false,
+  },
+  accountNumber: {
+    type: "string",
+    required: false,
+  },
+  validID: {
+   public_id: {
+        type: "string",
+        required: false,
+      },
+  },
+  photo: {
+    public_id: {
+        type: "string",
+        required: false,
+      },
+  },
+
 });
 
 const User = mongoose.model("User", userSchema);
