@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import {sendMail} from "../services/emailService";
+import { sendMail } from "../services/emailService";
 import { JWT_SECRET, SALT, EMAIL, PASSWORD, VERIFYURL, RESETURL } from "../env";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -10,6 +10,9 @@ import {
   doesUserExist,
   writeUserToDatabase,
   updateUserRecordWithEmail,
+  getAllUsers,
+  deleteDriver,
+  findDriver,
 } from "../services/userService";
 
 export const defaultController = (_req: Request, res: Response) => {
@@ -30,6 +33,7 @@ interface UserDataType {
   dateOfBirth?: string;
   gender?: string;
   isVerified?: boolean;
+  roles?: [string];
 }
 
 const secret = JWT_SECRET as string;
@@ -44,7 +48,7 @@ export const signUp = async (req: Request, res: Response) => {
     req.body;
   //check if user exists
   const userExists = await doesUserExist(email);
-  console.log("userExists: ", userExists)
+  console.log("userExists: ", userExists);
   if (userExists) {
     return res.status(400).json({ errors: [{ msg: "User already exists" }] });
   }
@@ -69,14 +73,14 @@ export const signUp = async (req: Request, res: Response) => {
   }
 
   const token = jwt.sign(email, secret);
-   const messageData = {
-        from: "E-move App",
-        to: email,
-        subject: "E-move Account Verification",
-        text: `Please click on the link below to verify your account`,
-        html: `<b>Please click on the link below to verify your account</b><br/>${VERIFYURL}${token}
-        `
-  }
+  const messageData = {
+    from: "E-move App",
+    to: email,
+    subject: "E-move Account Verification",
+    text: `Please click on the link below to verify your account`,
+    html: `<b>Please click on the link below to verify your account</b><br/>${VERIFYURL}${token}
+        `,
+  };
 
   //user created successfully
   //send email notification
@@ -132,7 +136,6 @@ export const verifyEmail = async (req: Request, res: Response) => {
   //change password
 };
 
-
 export const changePassword = async (req: Request, res: Response) => {
   try {
     //get password from request body
@@ -143,7 +146,9 @@ export const changePassword = async (req: Request, res: Response) => {
       Number(`${SALT}`)
     );
     //check if user exists
-    const userExists = (await doesUserExist(req.body.email)) as unknown as UserDataType;
+    const userExists = (await doesUserExist(
+      req.body.email
+    )) as unknown as UserDataType;
     if (!userExists) {
       return res.status(400).json({ errors: [{ msg: "User does not exist" }] });
     }
@@ -187,7 +192,6 @@ export const changePassword = async (req: Request, res: Response) => {
   }
 };
 
-
 // Login
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -195,9 +199,9 @@ export const login = async (req: Request, res: Response) => {
   if (!user) {
     return res.status(400).json({ message: "Invalid email address" });
   }
- 
-  const isMatch =  bcrypt.compareSync(password, user.password!);
-  console.log(isMatch)
+
+  const isMatch = bcrypt.compareSync(password, user.password!);
+  console.log(isMatch);
   if (!isMatch) {
     return res.status(400).json({ message: "Invalid password" });
   }
@@ -206,7 +210,7 @@ export const login = async (req: Request, res: Response) => {
   }
   const token = jwt.sign({ email: user.email }, secret, { expiresIn: "1h" });
   return res.status(200).json({ token });
-}
+};
 
 export const forgotPassword = async (req: Request, res: Response) => {
   const { email } = req.body;
@@ -238,47 +242,78 @@ export const forgotPassword = async (req: Request, res: Response) => {
 };
 
 export const resetpassword = async (req: Request, res: Response) => {
-  
   const { password, confirmPassword } = req.body;
   const { token } = req.params;
 
   if (password !== confirmPassword) {
-    return res.status(400).json({ message: "Password and confirm password are not the same" }); 
+    return res
+      .status(400)
+      .json({ message: "Password and confirm password are not the same" });
   }
 
   const verifyToken = jwt.verify(token, secret) as string;
   if (!verifyToken) {
     return res.status(400).json({ message: "Invalid token" });
   }
-  
-    const user = (await doesUserExist(verifyToken)) as unknown as UserDataType;
+
+  const user = (await doesUserExist(verifyToken)) as unknown as UserDataType;
+  if (!user) {
+    return res.status(400).json({ message: "Invalid email address" });
+  }
+
+  const hashedNewPassword = await bcrypt.hashSync(password, Number(`${SALT}`));
+
+  const newUserInfo = {
+    _id: user._id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    password: hashedNewPassword,
+    //password: password,
+    dateOfBirth: user.dateOfBirth,
+    gender: user.gender,
+    isVerified: user.isVerified,
+  };
+
+  const updateUser = updateUserRecordWithEmail(verifyToken, newUserInfo);
+
+  if (!updateUser) {
+    //please retry
+    return res.status(500).json({ message: "Please try again" });
+  }
+  return res.status(200).json({ message: "Password changed" });
+};
+
+// GET AND DELETE DRIVERS................................
+export const deleteDriverController = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const user = await deleteDriver(id);
+    console.log(user);
     if (!user) {
-      return res.status(400).json({ message: "Invalid email address" });
+      return res.status(400).json({ message: "No user found" });
     }
-
-    const hashedNewPassword = await bcrypt.hashSync(
-      password,
-      Number(`${SALT}`)
-    );
-
-    const newUserInfo = {
-      _id: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      password: hashedNewPassword,
-      //password: password,
-      dateOfBirth: user.dateOfBirth,
-      gender: user.gender,
-      isVerified: user.isVerified,
-    };
-
-    const updateUser = updateUserRecordWithEmail(verifyToken, newUserInfo);
-
-    if (!updateUser) {
-      //please retry
-      return res.status(500).json({ message: "Please try again" });
-    }
-    return res.status(200).json({ message: "Password changed" });
+    return res.status(200).json({user });
   
+};
+
+export const getOneDriverController = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const driver = await findDriver(id)
+
+  if (!driver) {
+    return res.status(400).json({ message: "No driver found" });
+  }
+  return res.status(200).json({ driver });
+};
+
+export const getAllDriversController = async (req: Request, res: Response) => {
+  const users = await getAllUsers();
+  if (!users) {
+    return res.status(400).json({ message: "No user found" });
+  }
+  const drivers = users.filter((user) => user.roles.includes("driver"));
+  if (!drivers) {
+    return res.status(400).json({ message: "No driver found" });
+  }
+  return res.status(200).json({ drivers });
 };

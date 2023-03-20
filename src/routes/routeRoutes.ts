@@ -9,4 +9,8 @@ const route = express.Router();
 route.post("/", routeAuth.body, adminAuthentication, addRoute);
 route.post("/edit", editRouteAuth.body, adminAuthentication, editRoute);
 
+// router.get( '/getAllDrivers', authenticateToken, getAllDrivers)
+// router.get( '/getOneDriver/:driverId',authenticateToken, getOneDriver);
+// router.delete('/deleteDriver/:driverId', authenticateToken, deleteDriver)
+
 export { route }

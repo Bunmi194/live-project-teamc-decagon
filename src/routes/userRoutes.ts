@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { defaultController, login, signUp , forgotPassword, resetpassword} from "../controllers/userController";
+import { defaultController, login, signUp , forgotPassword, resetpassword, deleteDriverController} from "../controllers/userController";
 import { signUpAuth, loginAuth, forgotPasswordAuth, resetPasswordAuth, routeAuth, editRouteAuth, adminAuthentication  } from "../middleWares/auth";
 import { verifyEmail } from "../controllers/userController";
-import { changePassword } from "../controllers/userController";
+import { changePassword , getAllDriversController, getOneDriverController} from "../controllers/userController";
 import { addRoute, editRoute } from "../controllers/routeController";
 
 const route = Router();
@@ -19,6 +19,10 @@ route.post("/forgotpassword", forgotPasswordAuth.body, forgotPassword)
 
 route.post("/resetpassword/:token", resetPasswordAuth.body, resetpassword);
 route.post("/change-password", changePassword);
+
+route.get('/drivers', getAllDriversController)
+route.get('/driver/:id', getOneDriverController)
+route.delete('/deleteDriver/:id', deleteDriverController)
 
 //routes for bus route
 // route.post("/v1/route", routeAuth.body, adminAuthentication, addRoute);
