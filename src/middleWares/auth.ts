@@ -1,5 +1,25 @@
 import { check, validationResult } from "express-validator";
-import { request, Request } from "express";
+import { request, Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import { JWT_SECRET } from "../env";
+import { findAnyUser } from "../services/userService";
+
+interface UserDataType {
+  _id?: string;
+  id?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  password?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  isVerified?: boolean;
+  roles?: [string];
+}
+
+interface JwtPayload {
+  id: string;
+}
 
 export const signUpAuth = {
   body: [
@@ -89,11 +109,67 @@ export const verifyDriverValidator = {
   ]
 }
 
-// export const editDriverValidator = {
-//    body: [
-//     check("routeOfOperation", "Phone number is required").not().isEmpty(),
-//     check("accountNumber", "Account Number is required").not().isEmpty(),
-//     check("validID", "Valid ID is required").not().isEmpty().isEmail(),
-//     check("photo", "Photo is required").not().isEmpty(), 
-//   ],
-// }
+export const editDriverValidator = {
+   body: [
+    check("phoneNumber", "Phone number is required").not().isEmpty(),
+    check("accountNumber", "Account Number is required").not().isEmpty(),
+    check("validID", "Valid ID is required").not().isEmpty().isEmail(),
+    check("photo", "Photo is required").not().isEmpty(), 
+  ],
+}
+export const routeAuth = {
+  body: [
+    check("pickUpStation", "Pickup station is required").not().isEmpty(),
+    check("destination", "Destination is required").not().isEmpty(),
+    check("price", "Price is required").not().isEmpty(),
+  ],
+};
+
+export const editRouteAuth = {
+  body: [
+    check("price", "Price is required").not().isEmpty()
+  ],
+};
+
+//include admin authorization
+
+export const adminAuthentication = async (req: Request, res: Response, next: NextFunction) => {
+    //get and validate token
+    const { authorization } = req.headers;
+    // const { id } = req.body;
+    const token = authorization?.split(" ")[1] as string;
+    // const userId = id as string;
+    console.log("HERE::")
+    console.log("token: ", token)
+    const validateToken = jwt.verify(`${token}`, `${JWT_SECRET}`, async (request, result)=> {
+      const resultNew = result as JwtPayload;
+      const id = resultNew?.id;
+    console.log("id: ", id)
+        if(!result || !id){
+           res.status(400).json({
+            message: "Bad RequestA"
+          });
+          return;
+        }
+        const userDetails = (await findAnyUser({_id: `${id}`})) as unknown as UserDataType;
+        console.log("userDetails: ", userDetails)
+        if(!userDetails){
+           res.status(400).json({
+            message: "Bad RequestB"
+          });
+          return;
+        }
+        const userRoles = userDetails.roles;
+        if(!userRoles?.includes('admin')){
+           res.status(400).json({
+            message: "Bad RequestC"
+          });
+          return;
+        }
+        console.log("HERSS")
+        next();
+    })
+    //check if role include admin
+    //call the next function
+    
+}

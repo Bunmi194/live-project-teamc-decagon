@@ -11,6 +11,9 @@ import {
   doesUserExist,
   writeUserToDatabase,
   updateUserRecordWithEmail,
+  getAllUsers,
+  deleteDriver,
+  findDriver,
 } from "../services/userService";
 
 export const defaultController = (_req: Request, res: Response) => {
@@ -138,6 +141,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
   //change password
   //change password
 };
+
 export const changePassword = async (req: Request, res: Response) => {
   try {
     //get password from request body
@@ -428,3 +432,36 @@ export async function editDriver(req: Request, res: Response) {
     .status(200)
     .json({ message: "Update successful", data: updateUser });
 }
+// GET AND DELETE DRIVERS................................
+export const deleteDriverController = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const user = await deleteDriver(id);
+    console.log(user);
+    if (!user) {
+      return res.status(400).json({ message: "No user found" });
+    }
+    return res.status(200).json({user });
+  
+};
+
+export const getOneDriverController = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const driver = await findDriver(id)
+
+  if (!driver) {
+    return res.status(400).json({ message: "No driver found" });
+  }
+  return res.status(200).json({ driver });
+};
+
+export const getAllDriversController = async (req: Request, res: Response) => {
+  const users = await getAllUsers();
+  if (!users) {
+    return res.status(400).json({ message: "No user found" });
+  }
+  const drivers = users.filter((user) => user.roles.includes("driver"));
+  if (!drivers) {
+    return res.status(400).json({ message: "No driver found" });
+  }
+  return res.status(200).json({ drivers });
+};

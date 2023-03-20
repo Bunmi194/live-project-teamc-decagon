@@ -6,10 +6,10 @@ import { verifyDriverValidator  } from "../middleWares/auth";
 
 const route = Router();
 
-route.get("/v1/verifyDriver/:passengerID", verifyDriverValidator.params, verifyDriverController);
-route.get("/v1/rejectDriver/:passengerID", verifyDriverValidator.params, rejectDriverController);
+route.get("/verifyDriver/:passengerID", verifyDriverValidator.params, verifyDriverController);
+route.get("/rejectDriver/:passengerID", verifyDriverValidator.params, rejectDriverController);
 
-route.get("/v1/getPendingUsers", getPendingUsersController)
+route.get("/getPendingUsers", getPendingUsersController)
 
 //router.post("/", , Upload, createMemory);
 
