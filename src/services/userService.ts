@@ -79,7 +79,30 @@ export const updateUserRecordWithEmail = async (
   }
 };
 
+
 export const getAllUsers = async () => {
-  const users = await User.find();
-  return users;
-};
+  try {
+    const users = await User.find();
+    return users;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
+export const findDriver = async (id: string) => {
+  const driver = await User.find({_id: id, roles: "driver"});
+  if(!driver){
+    throw new Error("Driver not found");
+  }
+  return driver;
+}
+export const deleteDriver = async (id: string) => {
+  console.log(id)
+    const user = await User.findByIdAndUpdate(id, {driverStatus: 'not started', $pop:{roles: 1}},{new: true});
+    if(!user){
+      throw new Error("Driver not found");
+    }
+    
+    return user; 
+}
