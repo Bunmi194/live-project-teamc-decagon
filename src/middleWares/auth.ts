@@ -20,6 +20,9 @@ interface UserDataType {
 interface JwtPayload {
   id: string;
 }
+export interface NewRequest extends Request {
+  user?: {};
+}
 
 export const signUpAuth = {
   body: [
@@ -63,21 +66,19 @@ export const changePasswordAuth = {
   ],
 };
 
-export const loginAuth = {  
-  body: [ 
+export const loginAuth = {
+  body: [
     check("email", "Email is required").not().isEmpty().isEmail(),
     check("password", "Password is required and must be more than 5 characters")
-      .not() 
+      .not()
       .isEmpty()
       .isLength({ min: 6 }),
-  ], 
+  ],
 };
 
 export const forgotPasswordAuth = {
-  body: [
-    check("email", "Email is required").not().isEmpty().isEmail(),
-  ]
-} 
+  body: [check("email", "Email is required").not().isEmpty().isEmail()],
+};
 
 export const resetPasswordAuth = {
   body: [
@@ -85,38 +86,38 @@ export const resetPasswordAuth = {
       .not()
       .isEmpty()
       .isLength({ min: 6 }),
-      check("confirmPassword", "Password is required and must be more than 5 characters")
+    check(
+      "confirmPassword",
+      "Password is required and must be more than 5 characters"
+    )
       .not()
       .isEmpty()
       //.equals(request.body.password)
       .isLength({ min: 6 }),
-
-  ]
-}
+  ],
+};
 
 export const addDriverValidator = {
-   body: [
+  body: [
     check("phoneNumber", "Phone number is required").not().isEmpty(),
     check("accountNumber", "Account Number is required").not().isEmpty(),
     check("validID", "Valid ID is required").not().isEmpty().isEmail(),
-    check("photo", "Photo is required").not().isEmpty(), 
+    check("photo", "Photo is required").not().isEmpty(),
   ],
-}
+};
 
 export const verifyDriverValidator = {
-  params: [
-    check("passengerID", "Passenger ID required").not().isEmpty(),
-  ]
-}
+  params: [check("passengerID", "Passenger ID required").not().isEmpty()],
+};
 
 export const editDriverValidator = {
-   body: [
+  body: [
     check("phoneNumber", "Phone number is required").not().isEmpty(),
     check("accountNumber", "Account Number is required").not().isEmpty(),
     check("validID", "Valid ID is required").not().isEmpty().isEmail(),
-    check("photo", "Photo is required").not().isEmpty(), 
+    check("photo", "Photo is required").not().isEmpty(),
   ],
-}
+};
 export const routeAuth = {
   body: [
     check("pickUpStation", "Pickup station is required").not().isEmpty(),
@@ -126,50 +127,52 @@ export const routeAuth = {
 };
 
 export const editRouteAuth = {
-  body: [
-    check("price", "Price is required").not().isEmpty()
-  ],
+  body: [check("price", "Price is required").not().isEmpty()],
 };
 
 //include admin authorization
 
-export const adminAuthentication = async (req: Request, res: Response, next: NextFunction) => {
-    //get and validate token
-    const { authorization } = req.headers;
-    // const { id } = req.body;
-    const token = authorization?.split(" ")[1] as string;
-    // const userId = id as string;
-    console.log("HERE::")
-    console.log("token: ", token)
-    const validateToken = jwt.verify(`${token}`, `${JWT_SECRET}`, async (request, result)=> {
+export const adminAuthentication = async (
+  req: NewRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  //get and validate token
+  const { authorization } = req.headers;
+  const token = authorization?.split(" ")[1] as string;
+  const validateToken = jwt.verify(
+    `${token}`,
+    `${JWT_SECRET}`,
+    async (request, result) => {
       const resultNew = result as JwtPayload;
       const id = resultNew?.id;
-    console.log("id: ", id)
-        if(!result || !id){
-           res.status(400).json({
-            message: "Bad RequestA"
-          });
-          return;
-        }
-        const userDetails = (await findAnyUser({_id: `${id}`})) as unknown as UserDataType;
-        console.log("userDetails: ", userDetails)
-        if(!userDetails){
-           res.status(400).json({
-            message: "Bad RequestB"
-          });
-          return;
-        }
-        const userRoles = userDetails.roles;
-        if(!userRoles?.includes('admin')){
-           res.status(400).json({
-            message: "Bad RequestC"
-          });
-          return;
-        }
-        console.log("HERSS")
-        next();
-    })
-    //check if role include admin
-    //call the next function
-    
-}
+      console.log("id: ", id);
+      if (!result || !id) {
+        res.status(400).json({
+          message: "Bad RequestA",
+        });
+        return;
+      }
+      const userDetails = (await findAnyUser({
+        _id: `${id}`,
+      })) as unknown as UserDataType;
+      req.user = userDetails;
+      console.log("userDetails: ", userDetails);
+      if (!userDetails) {
+        res.status(400).json({
+          message: "Bad RequestB",
+        });
+        return;
+      }
+      const userRoles = userDetails.roles;
+      if (!userRoles?.includes("admin")) {
+        res.status(400).json({
+          message: "Bad RequestC",
+        });
+        return;
+      }
+      console.log("HERSS");
+      next();
+    }
+  );
+};

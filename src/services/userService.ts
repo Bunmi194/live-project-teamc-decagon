@@ -13,19 +13,19 @@ interface UserDataType {
   roles?: [string];
 }
 
-export const doesUserExist = (data: { email?: string, id?: string }) => {
+export const doesUserExist = (data: { email?: string; id?: string }) => {
   if (data.email) {
     return new Promise((resolve) => {
       const user = User.findOne({ email: data.email }) as UserDataType;
       resolve(user);
     });
   } else if (data.id) {
-      return new Promise((resolve) => {
+    return new Promise((resolve) => {
       const user = User.findById(data.id) as UserDataType;
       resolve(user);
     });
   }
-}  
+};
 
 //pass object to this function to find user
 export const findAnyUser = async (data: UserDataType) => {
@@ -41,14 +41,6 @@ export const findAnyUser = async (data: UserDataType) => {
 //writing user to database
 
 export const writeUserToDatabase = async (user: {}) => {
-  // try {
-  //   const newUser = new User(user);
-  //   await newUser.save();
-  //   return newUser;
-  // } catch (error) {
-  //   console.log(error);
-  //   return false;
-  // }
   const newUser = new User(user);
   return newUser
     .save()
@@ -68,7 +60,7 @@ export const updateUserRecordWithEmail = async (
   userData: UserDataType
 ) => {
   try {
-    const user = (await doesUserExist({email})) as UserDataType;
+    const user = (await doesUserExist({ email })) as UserDataType;
     const updatedUser = await User.findByIdAndUpdate(user._id, userData, {
       new: true,
     });
@@ -79,7 +71,6 @@ export const updateUserRecordWithEmail = async (
   }
 };
 
-
 export const getAllUsers = async () => {
   try {
     const users = await User.find();
@@ -88,22 +79,26 @@ export const getAllUsers = async () => {
     console.log(error);
     return false;
   }
-}
+};
 
 export const findDriver = async (id: string) => {
-  const driver = await User.find({_id: id, roles: "driver"});
-  if(!driver){
+  const driver = await User.find({ _id: id, roles: "driver" });
+  if (!driver) {
     throw new Error("Driver not found");
   }
   return driver;
-}
+};
 
 export const deleteDriver = async (id: string) => {
-  console.log(id)
-    const user = await User.findByIdAndUpdate(id, {driverStatus: 'not started', $pop:{roles: 1}},{new: true});
-    if(!user){
-      throw new Error("Driver not found");
-    }
-    
-    return user; 
-}
+  console.log(id);
+  const user = await User.findByIdAndUpdate(
+    id,
+    { driverStatus: "not started", $pop: { roles: 1 } },
+    { new: true }
+  );
+  if (!user) {
+    throw new Error("Driver not found");
+  }
+
+  return user;
+};
