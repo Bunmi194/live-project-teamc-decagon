@@ -109,7 +109,7 @@ export const getAvailableRoutes = async (req: Request, res: Response) => {
 
 export const getTotalCounts = async (req: Request, res: Response) => {
   try {
-    const users = await getAllUsers();
+    const users = await getAllUsers() as Array<any>;
     if (!users) {
       res.status(400).json({ message: "something wrong" });
     }
