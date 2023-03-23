@@ -19,6 +19,7 @@ import {
   deleteDriver,
   findDriver,
 } from "../services/userService";
+import Transaction from "../models/TransactionModel";
 import { writeTransactionToDatabase } from "../services/transactionService";
 
 export const defaultController = (_req: Request, res: Response) => {
@@ -478,6 +479,24 @@ export const getAllDriversController = async (req: Request, res: Response) => {
   return res.status(200).json({ drivers });
 };
 
+
+export const getTransaction = async (
+  req: Request,
+  res: Response,
+  ) => {
+    try{
+      const transaction = await Transaction.find({
+        userId: req.params.userId,
+      });
+      res.status(200).json({message:"success",transaction: transaction});
+    } catch (error) {
+      res.send({
+        status: "An error occured",
+        message: "Data not found",
+      });
+    }
+  };
+  
 export const fundWalletController = async (req: Request, res: Response) => {
   let form = _.pick(req.body, ["amount", "email", "full_name", "metadata"]);
   // const { amount, email, full_name } = req.body

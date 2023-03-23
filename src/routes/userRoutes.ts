@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { defaultController, login, signUp , forgotPassword, resetpassword, addDriver, editDriver, deleteDriverController, fundWalletController, payStackCallback} from "../controllers/userController";
+import { defaultController, login, signUp , forgotPassword, resetpassword, addDriver, editDriver, deleteDriverController, fundWalletController, payStackCallback, getTransaction} from "../controllers/userController";
 import { signUpAuth, loginAuth, forgotPasswordAuth, resetPasswordAuth, addDriverValidator, routeAuth, editRouteAuth, adminAuthentication  } from "../middleWares/auth";
 import { verifyEmail } from "../controllers/userController";
 import { Upload } from "../middleWares/imageUpload";
@@ -30,6 +30,11 @@ route.get("/drivers", getAllDriversController);
 route.get("/driver/:id", getOneDriverController);
 route.delete("/deleteDriver/:id", deleteDriverController);
 
+route.get('/transaction/:userId', getTransaction)
+
+//routes for bus route
+// route.post("/v1/route", routeAuth.body, adminAuthentication, addRoute);
+// route.post("/v1/route/edit", editRouteAuth.body, adminAuthentication, editRoute);
 route.post("/v1/add-driver/:token", addDriver);
 route.post("/v1/edit-driver/:id", editDriver);
 
