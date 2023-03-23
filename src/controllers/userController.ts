@@ -1,11 +1,15 @@
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
+import request from "request";
+import _ from "lodash";
 import { sendMail } from "../services/emailService";
 import { JWT_SECRET, SALT, EMAIL, PASSWORD, VERIFYURL, RESETURL } from "../env";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import User from "../models/userModel";
 import cloudUpload from "../utils/cloudinary";
+const { initializePayment, verifyPayment } =
+  require("../utils/paystack")(request);
 
 import {
   doesUserExist,
@@ -15,6 +19,7 @@ import {
   deleteDriver,
   findDriver,
 } from "../services/userService";
+import { writeTransactionToDatabase } from "../services/transactionService";
 
 export const defaultController = (_req: Request, res: Response) => {
   res.send("Welcome E-move");
@@ -41,6 +46,15 @@ interface UserDataType {
   accountNumber?: string;
   validID?: string;
   photo?: string;
+  wallet_balance?: number;
+}
+
+interface TransactionDataType {
+  status?: string;
+  transactionType?: string;
+  userId?: string;
+  referenceId?: string;
+  amount?: number;
 }
 
 const secret = JWT_SECRET as string;
@@ -385,16 +399,15 @@ export async function editDriver(req: Request, res: Response) {
 
   if (photo) {
     cloudImagePhoto = await cloudUpload.uploader.upload(photo!, {
-    folder: "emove/photos",
-  });
+      folder: "emove/photos",
+    });
   }
- 
+
   if (validID) {
     cloudImageValidID = await cloudUpload.uploader.upload(validID, {
       folder: "emove/validID",
     });
-  
-}
+  }
 
   const updatedUserInfo = {
     _id: user._id,
@@ -434,19 +447,18 @@ export async function editDriver(req: Request, res: Response) {
 }
 // GET AND DELETE DRIVERS................................
 export const deleteDriverController = async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const user = await deleteDriver(id);
-    console.log(user);
-    if (!user) {
-      return res.status(400).json({ message: "No user found" });
-    }
-    return res.status(200).json({user });
-  
+  const { id } = req.params;
+  const user = await deleteDriver(id);
+  console.log(user);
+  if (!user) {
+    return res.status(400).json({ message: "No user found" });
+  }
+  return res.status(200).json({ user });
 };
 
 export const getOneDriverController = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const driver = await findDriver(id)
+  const driver = await findDriver(id);
 
   if (!driver) {
     return res.status(400).json({ message: "No driver found" });
@@ -464,4 +476,111 @@ export const getAllDriversController = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "No driver found" });
   }
   return res.status(200).json({ drivers });
+};
+
+export const fundWalletController = async (req: Request, res: Response) => {
+  let form = _.pick(req.body, ["amount", "email", "full_name", "metadata"]);
+  // const { amount, email, full_name } = req.body
+  // const form = {amount, email, full_name}
+  console.log(form);
+
+  form.metadata = {
+    full_name: form.full_name,
+  };
+  console.log(form.metadata);
+  form.amount *= 100;
+  initializePayment(form, (error: any, body: any) => {
+    if (error) {
+      //handle errors
+      console.log(error);
+      return;
+    }
+    let response = JSON.parse(body);
+    res.send(response);
+    //res.redirect(response.data.authorization_url);
+  });
+};
+
+export const payStackCallback = async (req: Request, res: Response) => {
+  const ref = req.query.reference;
+  console.log(ref);
+  verifyPayment(ref, async (error: any, body: any) => {
+    if (error) {
+      //handle errors appropriately
+      console.log(error);
+      return res.redirect("/error");
+    }
+    let response = JSON.parse(body);
+    console.log("response", response);
+    const data = _.at(response.data, [
+      "reference",
+      "amount",
+      "customer.email",
+      "metadata.full_name",
+      "status",
+    ]);
+    console.log(data);
+
+    const [reference, amount, email, full_name, status] = data;
+
+    const user = (await doesUserExist({ email })) as UserDataType;
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    if (status !== "success") {
+      const newTransaction = {
+        status: "failed",
+        transactionType: "credit",
+        userId: user._id,
+        referenceId: reference,
+        amount: amount / 100,
+      };
+      const transaction = await writeTransactionToDatabase(newTransaction);
+      console.log(transaction);
+
+      if (!transaction) {
+        return res
+          .status(400)
+          .json({ errors: [{ msg: "Transaction could not be created" }] });
+      }
+    }
+
+    const updatedUserInfo = {
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      password: user.password,
+      dateOfBirth: user.dateOfBirth,
+      gender: user.gender,
+      isVerified: user.isVerified,
+      phoneNumber: user.phoneNumber,
+      accountNumber: user.accountNumber,
+      driverStatus: user.driverStatus,
+      photo: user.photo,
+      validID: user.validID,
+      wallet_balance: user.wallet_balance! + amount / 100,
+    };
+
+    const newTransaction = {
+      status: "success",
+      transactionType: "credit",
+      userId: user._id,
+      referenceId: reference,
+      amount: amount / 100,
+    };
+
+    const transaction = await writeTransactionToDatabase(newTransaction);
+
+    const updateUser = await updateUserRecordWithEmail(user.email!, updatedUserInfo);
+
+    if (!updateUser && !transaction) {
+      //please retry
+      return res.status(500).json({ message: "Please try again" });
+    }
+
+    return res.status(200).json({ message: "Success", user : updateUser});
+  });
 };

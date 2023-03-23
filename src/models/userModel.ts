@@ -64,6 +64,11 @@ const userSchema = new Schema({
         required: false,
       },
   },
+    wallet_balance: {
+    type: "number",
+    required: false,
+    default: 0.00
+  }
 
 });
 

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { defaultController, login, signUp , forgotPassword, resetpassword, addDriver, editDriver, deleteDriverController} from "../controllers/userController";
+import { defaultController, login, signUp , forgotPassword, resetpassword, addDriver, editDriver, deleteDriverController, fundWalletController, payStackCallback} from "../controllers/userController";
 import { signUpAuth, loginAuth, forgotPasswordAuth, resetPasswordAuth, addDriverValidator, routeAuth, editRouteAuth, adminAuthentication  } from "../middleWares/auth";
 import { verifyEmail } from "../controllers/userController";
 import { Upload } from "../middleWares/imageUpload";
@@ -26,7 +26,10 @@ route.get('/driver/:id', getOneDriverController)
 route.delete('/deleteDriver/:id', deleteDriverController)
 
 route.post("/v1/add-driver/:token",  addDriver )
-route.post("/v1/edit-driver/:id",  editDriver )
+route.post("/v1/edit-driver/:id", editDriver)
+
+route.post("/paystack/pay", fundWalletController)
+route.get("/paystack/callback", payStackCallback)
 
 //router.post("/", , Upload, createMemory);
 
