@@ -14,6 +14,7 @@ import {
   deleteDriver,
   findDriver,
 } from "../services/userService";
+import Transaction from "../models/TransactionModel";
 
 export const defaultController = (_req: Request, res: Response) => {
   res.send("Welcome E-move");
@@ -317,3 +318,22 @@ export const getAllDriversController = async (req: Request, res: Response) => {
   }
   return res.status(200).json({ drivers });
 };
+
+
+export const getTransaction = async (
+  req: Request,
+  res: Response,
+  ) => {
+    try{
+      const transaction = await Transaction.find({
+        userId: req.params.userId,
+      });
+      res.status(200).json({message:"success",transaction: transaction});
+    } catch (error) {
+      res.send({
+        status: "An error occured",
+        message: "Data not found",
+      });
+    }
+  };
+  
