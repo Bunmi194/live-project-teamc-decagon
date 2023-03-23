@@ -14,6 +14,24 @@ interface routeDataType {
   price?: number;
 }
 
+interface UserDataType {
+  _id?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  password?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  roles?: string[];
+  driverStatus?: string;
+  isVerified?: boolean;
+  routeOfOperation?: [];
+  phoneNumber?: string;
+  accountNumber?: string;
+  validID?: string;
+  photo?: string;
+}
+
 export const addRoute = async (req: Request, res: Response) => {
   //take the data
   const { pickUpStation, destination, price } = req.body;
@@ -109,7 +127,7 @@ export const getAvailableRoutes = async (req: Request, res: Response) => {
 
 export const getTotalCounts = async (req: Request, res: Response) => {
   try {
-    const users = await getAllUsers() as Array<any>;
+    const users = await getAllUsers() as unknown as Array<UserDataType>;
     if (!users) {
       res.status(400).json({ message: "something wrong" });
     }

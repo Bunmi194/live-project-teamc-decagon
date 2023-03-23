@@ -2,3 +2,6 @@ node_modules
 dist
 .env
 tokenGenerator.js
+src/seedData.ts
+src/seedData.js
+.gitignore
