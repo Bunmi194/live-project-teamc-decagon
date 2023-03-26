@@ -1,6 +1,27 @@
 import { Router } from "express";
-import { defaultController, login, signUp , forgotPassword, resetpassword, addDriver, editDriver, deleteDriverController, fundWalletController, payStackCallback, getTransaction} from "../controllers/userController";
-import { signUpAuth, loginAuth, forgotPasswordAuth, resetPasswordAuth, addDriverValidator, routeAuth, editRouteAuth, adminAuthentication  } from "../middleWares/auth";
+import {
+  defaultController,
+  login,
+  signUp,
+  forgotPassword,
+  resetpassword,
+  addDriver,
+  editDriver,
+  deleteDriverController,
+  fundWalletController,
+  payStackCallback,
+  getTransaction,
+} from "../controllers/userController";
+import {
+  signUpAuth,
+  loginAuth,
+  forgotPasswordAuth,
+  resetPasswordAuth,
+  addDriverValidator,
+  routeAuth,
+  editRouteAuth,
+  adminAuthentication,
+} from "../middleWares/auth";
 import { verifyEmail } from "../controllers/userController";
 import { Upload } from "../middleWares/imageUpload";
 import {
@@ -10,6 +31,7 @@ import {
 } from "../controllers/userController";
 import { addRoute, editRoute } from "../controllers/routeController";
 import { getTripsController } from "../controllers/tripsController";
+import { BookAtrip } from "../controllers/tripsController";
 
 const route = Router();
 
@@ -30,7 +52,7 @@ route.get("/drivers", getAllDriversController);
 route.get("/driver/:id", getOneDriverController);
 route.delete("/deleteDriver/:id", deleteDriverController);
 
-route.get('/transaction/:userId', getTransaction)
+route.get("/transaction/:userId", getTransaction);
 
 //routes for bus route
 // route.post("/v1/route", routeAuth.body, adminAuthentication, addRoute);
@@ -40,8 +62,10 @@ route.post("/v1/edit-driver/:id", editDriver);
 
 route.get("/trips", getTripsController);
 
-route.post("/paystack/pay", fundWalletController)
-route.get("/paystack/callback", payStackCallback)
+route.post("/paystack/pay", fundWalletController);
+route.get("/paystack/callback", payStackCallback);
+
+route.get("/bookTrip/:userId/:routeId", BookAtrip);
 
 //router.post("/", , Upload, createMemory);
 

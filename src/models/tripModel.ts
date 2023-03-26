@@ -22,6 +22,14 @@ const tripSchema = new Schema(
       ref: "users",
       required: false,
     },
+    price: {
+      type: "number",
+      required: true,
+    },
+    completed: {
+      type: "boolean",
+      default: false,
+    },
   },
   { timestamps: true }
 );
