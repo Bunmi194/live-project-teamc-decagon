@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./dist",
-    "build": "yarn && yarn add typescript && tsc",
+    "build": "yarn && tsc",
     "compile": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -35,7 +35,8 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.1",
     "requesst": "^0.0.1-security",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "typescript": "^5.0.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.13",
