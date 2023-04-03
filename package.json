@@ -46,5 +46,8 @@
     "@types/request": "^2.48.8",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.21"
+  },
+  "engines": {
+    "node": ">=18 <19"
   }
 }
