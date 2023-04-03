@@ -1,34 +1,15 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 
-const transactionsSchema = new Schema({
-    status: {
-        type: "string",
-        enum: ["success", "failed"],
-        required: true
-    },
-    transactionType: {
-        type: "string",
-        enum: ["credit", "debit"],
-        required: true
-    },
-    userId: {
-        type: "string",
-        required: true
-    },
-    referenceId: {
-        type: "string",
-        required: true
-    },
-    amount: {
-        type: "number",
-        required: true
-    },
+const Schema = mongoose.Schema;
 
+const transactionSchema = new Schema({
+    userId: { type: String, required: true },
+    status: { type: String },
+    amount: { type: Number, required: true },
+    transactionType: { type: String, required: true },
+    processed: { type: Boolean, required: true },
+});
 
-})
+const Transaction = mongoose.model("transaction", transactionSchema);
 
-transactionsSchema.set("timestamps", true)
-
-const Transactions = mongoose.model("Transaction", transactionsSchema);
-
-export default Transactions;
+export default Transaction;

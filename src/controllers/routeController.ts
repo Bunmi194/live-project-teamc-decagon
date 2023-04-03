@@ -63,7 +63,8 @@ export const addRoute = async (req: Request, res: Response) => {
 export const editRoute = async (req: Request, res: Response) => {
   //get route id
   // const { routeId } = req.headers;
-  const { price, id } = req.body;
+  const { price } = req.body;
+  const id: string = req.params['id'] as unknown as string; 
   //check if route exists
   const doesRouteExist = await routeExists({ _id: id });
   if (!doesRouteExist) {
@@ -72,7 +73,7 @@ export const editRoute = async (req: Request, res: Response) => {
     });
   }
   //fetch route details
-  const newRouteID = id as string;
+  const newRouteID = id as unknown as string;
   //update route details
   const routeDetails = {
     price: price,
