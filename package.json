@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./dist",
-    "build": "yarn && tsc",
+    "build": "yarn && yarn add typescript && tsc",
     "compile": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
