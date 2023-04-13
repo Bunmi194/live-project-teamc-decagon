@@ -279,6 +279,7 @@ export const resetpassword = async (req: Request, res: Response) => {
   }
 
   const user = (await doesUserExist({ email: verifyToken?.email })) as UserDataType;
+  console.log("user: ", user);
   if (!user) {
     return res.status(400).json({ message: "Invalid email address" });
   }
