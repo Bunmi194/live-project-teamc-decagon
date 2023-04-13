@@ -219,13 +219,13 @@ export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const user = (await doesUserExist({ email })) as UserDataType;
   if (!user) {
-    return res.status(400).json({ message: "Invalid email address" });
+    return res.status(400).json({ message: "Invalid email address or password" });
   }
 
   const isMatch = bcrypt.compareSync(password, user.password!);
   console.log(isMatch);
   if (!isMatch) {
-    return res.status(400).json({ message: "Invalid password" });
+    return res.status(400).json({ message: "Invalid email address or password" });
   }
   if (!user.isVerified) {
     return res.status(400).json({ message: "Please verify your email" });
