@@ -266,7 +266,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 export const resetpassword = async (req: Request, res: Response) => {
   const { password, confirmPassword } = req.body;
   const { token } = req.params;
-
+  console.log("Checkout")
   if (password !== confirmPassword) {
     return res
       .status(400)
@@ -274,12 +274,15 @@ export const resetpassword = async (req: Request, res: Response) => {
   }
 
   const verifyToken = jwt.verify(token, secret) as Record<string, any>;
+  const email = jwt.verify(token, secret) as unknown as string;
   if (!verifyToken) {
     return res.status(400).json({ message: "Invalid token" });
   }
 
-  const user = (await doesUserExist({ email: verifyToken?.email })) as UserDataType;
+  const user = (await doesUserExist({ email })) as UserDataType;
   console.log("user: ", user);
+  console.log("Email: ", verifyToken?.email);
+  console.log("verifyToken: ", verifyToken);
   if (!user) {
     return res.status(400).json({ message: "Invalid email address" });
   }
@@ -298,7 +301,7 @@ export const resetpassword = async (req: Request, res: Response) => {
     isVerified: user.isVerified,
   };
 
-  const updateUser = updateUserRecordWithEmail(verifyToken.email, newUserInfo);
+  const updateUser = updateUserRecordWithEmail(email, newUserInfo);
 
   if (!updateUser) {
     //please retry
