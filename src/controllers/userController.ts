@@ -110,6 +110,7 @@ export const signUp = async (req: Request, res: Response) => {
     return res.status(201).json({
       User,
       message: "User created successfully",
+      token,
       success: true,
     });
   } catch (error) {
@@ -230,7 +231,7 @@ export const login = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "Please verify your email" });
   }
   const token = jwt.sign({ email: user.email }, secret, { expiresIn: "1h" });
-  return res.status(200).json({ token });
+  return res.status(200).json({ token, user });
 };
 
 export const forgotPassword = async (req: Request, res: Response) => {
