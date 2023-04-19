@@ -21,7 +21,7 @@ import {
 } from "../services/userService";
 //import Transaction from "../models/TransactionModel";
 import { writeTransactionToDatabase } from "../services/transactionService";
-import Transactions from "../models/transactionModel";
+import Transactions from "../models/TransactionModel";
 
 export const defaultController = (_req: Request, res: Response) => {
   res.send("Welcome E-move");
@@ -495,7 +495,7 @@ export const getTransaction = async (req: Request, res: Response) => {
 };
 
 export const fundWalletController = async (req: Request, res: Response) => {
-  let form = _.pick(req.body, ["amount", "email", "full_name", "metadata"]);
+  let form = _.pick(req.body, ["amount", "email", "full_name", "metadata", "callback_url"]);
   // const { amount, email, full_name } = req.body
   // const form = {amount, email, full_name}
   console.log(form);
@@ -503,7 +503,10 @@ export const fundWalletController = async (req: Request, res: Response) => {
   form.metadata = {
     full_name: form.full_name,
   };
+  form.callback_url = process.env.PAYSTACK_CALLBACK;
   console.log(form.metadata);
+  console.log("meta: ",form.metadata);
+  console.log("callback_url: ",form.callback_url);
   form.amount *= 100;
   initializePayment(form, (error: any, body: any) => {
     if (error) {

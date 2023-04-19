@@ -11,7 +11,7 @@ import {
 } from "../services/userService";
 import Trip from "../models/tripModel";
 import { routeExists } from "../services/routeService";
-import Transactions from "../models/transactionModel";
+import Transactions from "../models/TransactionModel";
 
 interface UserDataType {
   _id?: string;
@@ -46,14 +46,22 @@ export const getTripsController = async (req: NewRequest, res: Response) => {
   let token;
   authorization ? (token = authorization.split(" ")[1]) : (token = undefined);
 
+  console.log("authorization: ", authorization)
+
   jwt.verify(`${token}`, `${JWT_SECRET}`, async (err, result: any) => {
     if (err) {
+      console.log("Error: ",err);
       return res.status(400).json({
         message: "Bad request",
         data: err,
       });
     }
-    const id = result?.id;
+    const email = result?.email;
+    // console.log("id: ", id)
+    console.log("result: ", result)
+    const userDetail = (await doesUserExist({ email: email })) as UserDataType;
+    console.log("userDetail: ", userDetail)
+    const id = userDetail._id;
     if (!id) {
       return res.status(400).json({
         message: "Bad request",
