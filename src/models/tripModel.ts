@@ -7,13 +7,18 @@ const tripSchema = new Schema(
       ref: "routes",
       required: true,
     },
+    trxn_ref: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "transactions",
+      required: false,
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
       required: true,
     },
     status: {
-      type: "boolean",
+      type: Boolean,
       required: true,
       default: false,
     },
@@ -23,11 +28,11 @@ const tripSchema = new Schema(
       required: false,
     },
     price: {
-      type: "number",
+      type: Number,
       required: true,
     },
     completed: {
-      type: "boolean",
+      type: Boolean,
       default: false,
     },
   },

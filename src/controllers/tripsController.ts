@@ -110,7 +110,8 @@ export const BookAtrip = async (req: Request, res: Response) => {
   }
 
   //check if route exists
-  const doesRouteExist = await routeExists({ id: routeId });
+  const doesRouteExist = await routeExists(routeId);
+
   if (!doesRouteExist) {
     return res.status(404).json({
       message: "Route does not exist",
@@ -121,9 +122,8 @@ export const BookAtrip = async (req: Request, res: Response) => {
     userId: userId,
     routeId: routeId,
     status: false,
-    price: 300,
-    completed: false,
-    driverId: "6412138e5967b7845b60ef9a",
+    price: doesRouteExist.price,
+    completed: false
   };
 
   const newTrip = await Trip.create(tripDetails);
@@ -141,19 +141,6 @@ export const BookAtrip = async (req: Request, res: Response) => {
   }
 
   const updatedUserInfo = {
-    _id: userExist._id,
-    firstName: userExist.firstName,
-    lastName: userExist.lastName,
-    email: userExist.email,
-    password: userExist.password,
-    dateOfBirth: userExist.dateOfBirth,
-    gender: userExist.gender,
-    isVerified: userExist.isVerified,
-    phoneNumber: userExist.phoneNumber,
-    accountNumber: userExist.accountNumber,
-    driverStatus: userExist.driverStatus,
-    photo: userExist.photo,
-    validID: userExist.validID,
     wallet_balance: userExist.wallet_balance! - newTrip.price,
   };
 
@@ -163,21 +150,16 @@ export const BookAtrip = async (req: Request, res: Response) => {
   );
 
   // //create transaction
-  const transactionDetails = {
-    userId: userExist._id,
-    tripId: newTrip.id,
-    amount: newTrip.price,
-    status: "success",
-    transactionType: "debit",
-  };
 
   const transaction = await Transactions.create({
+    userId: userExist._id,
+    tripId: newTrip._id,
     amount: newTrip.price,
     status: "success",
     transactionType: "debit",
-    userId: userExist._id,
   });
 
+  await Trip.findByIdAndUpdate(newTrip._id, { trxn_ref: transaction._id});
   return res.status(201).json({
     message: "Trip created successfully",
     trip: newTrip,

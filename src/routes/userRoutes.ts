@@ -65,7 +65,7 @@ route.get("/trips", getTripsController);
 route.post("/paystack/pay", fundWalletController);
 route.get("/paystack/callback", payStackCallback);
 
-route.get("/bookTrip/:userId/:routeId", BookAtrip);
+route.post("/bookTrip/:userId/:routeId", BookAtrip);
 
 //router.post("/", , Upload, createMemory);
 

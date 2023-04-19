@@ -11,6 +11,7 @@ interface UserDataType {
   gender?: string;
   isVerified?: boolean;
   roles?: [string];
+  wallet_balance?: number;
 }
 
 export const doesUserExist = (data: { email?: string; id?: string }) => {
