@@ -18,6 +18,17 @@ export const routeExists = async (id: string) => {
   } 
 };
 
+export const routeExistNEW = async (data: {}) => {
+  return Route.find(data)
+    .then((data) => {
+      return data;
+    })
+    .catch((err) => {
+      console.log("Error: ", err);
+      return false;
+    });
+};
+
 export const createRoute = async (data: {}) => {
   const route = new Route(data);
   return route

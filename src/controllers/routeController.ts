@@ -4,6 +4,7 @@ import {
   createRoute,
   updateRoute,
   getAllRoutes,
+  routeExistNEW
 } from "../services/routeService";
 import { getAllUsers } from "../services/userService";
 
@@ -39,7 +40,7 @@ export const addRoute = async (req: Request, res: Response) => {
     pickUpStation,
     destination,
   };
-  const doesRouteExists = (await routeExists(
+  const doesRouteExists = (await routeExistNEW(
     routeDetails
   )) as unknown as Array<routeDataType>;
   console.log("doesRouteExists: ", doesRouteExists);
@@ -65,7 +66,7 @@ export const editRoute = async (req: Request, res: Response) => {
   // const { routeId } = req.headers;
   const { price, id } = req.body;
   //check if route exists
-  const doesRouteExist = await routeExists({ _id: id });
+  const doesRouteExist = await routeExistNEW({ _id: id });
   if (!doesRouteExist) {
     return res.status(404).json({
       message: "Route does not exist",
@@ -95,7 +96,7 @@ export const getRoute = async (req: Request, res: Response) => {
   const { routeId } = req.params;
 
   //check if route exists
-  const doesRouteExist = await routeExists({ _id: routeId });
+  const doesRouteExist = await routeExistNEW({ _id: routeId });
   console.log(doesRouteExist);
   if (!doesRouteExist) {
     return res.status(404).json({

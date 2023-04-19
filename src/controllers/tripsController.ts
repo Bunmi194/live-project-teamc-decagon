@@ -97,9 +97,19 @@ export const createTrip = async (data: {}) => {
 
 export const BookAtrip = async (req: Request, res: Response) => {
   //get user id
-  const { userId } = req.params;
+  const { userId, routeId } = req.body;
   //get route id
-  const { routeId } = req.params;
+  // const { routeId } = req.params;
+
+  console.log("Details: ", routeId, userId);
+  console.log("req body: ", req.body);
+  console.log("Details: ", typeof(routeId), typeof(userId));
+
+  if(typeof userId !== "string" || typeof routeId !== "string"){
+    return res.status(404).json({
+      message: "Bad Request",
+    });
+  }
 
   //check if user exists
   const userExist = (await doesUserExist({ id: userId })) as UserDataType;

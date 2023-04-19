@@ -603,3 +603,20 @@ export const payStackCallback = async (req: Request, res: Response) => {
     return res.status(200).json({ message: "Success", user: updateUser });
   });
 };
+
+export const userRecord = async (req: Request, res:Response) => {
+  const userId = req.params.id;
+  console.log("userId: ", userId)
+  if(typeof userId !== "string"){
+    return res.status(404).json({
+      message: "Bad Request"
+    })
+  }
+  const user = await doesUserExist({ id: userId }) as UserDataType;
+  console.log("user: ", user)
+  return res.status(200).json({
+    message: "user fetched",
+    user
+  })
+
+}

@@ -21,6 +21,7 @@ export const doesUserExist = (data: { email?: string; id?: string }) => {
       resolve(user);
     });
   } else if (data.id) {
+    console.log("dataID: ", data.id)
     return new Promise((resolve) => {
       const user = User.findById(data.id) as UserDataType;
       resolve(user);

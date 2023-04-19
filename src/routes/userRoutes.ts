@@ -11,6 +11,7 @@ import {
   fundWalletController,
   payStackCallback,
   getTransaction,
+  userRecord
 } from "../controllers/userController";
 import {
   signUpAuth,
@@ -42,6 +43,7 @@ route.post("/signup", signUpAuth.body, signUp);
 route.post("/login", loginAuth.body, login);
 
 route.get("/verify/:token", verifyEmail);
+route.get("/user/:id", userRecord);
 
 route.post("/forgotpassword", forgotPasswordAuth.body, forgotPassword);
 
@@ -65,7 +67,7 @@ route.get("/trips", getTripsController);
 route.post("/paystack/pay", fundWalletController);
 route.get("/paystack/callback", payStackCallback);
 
-route.post("/bookTrip/:userId/:routeId", BookAtrip);
+route.post("/booktrip/", BookAtrip);//:userId/:routeId
 
 //router.post("/", , Upload, createMemory);
 
