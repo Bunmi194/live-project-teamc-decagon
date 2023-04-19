@@ -8,6 +8,8 @@ const transactionSchema = new Schema({
     amount: { type: Number, required: true },
     transactionType: { type: String, required: true },
     processed: { type: Boolean, required: true },
+    referenceId: { type: String, required: false },
+    tripId: { type: String, required: false },
 });
 
 const Transaction = mongoose.model("transaction", transactionSchema);
