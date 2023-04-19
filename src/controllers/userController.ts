@@ -19,9 +19,11 @@ import {
   deleteDriver,
   findDriver,
 } from "../services/userService";
-//import Transaction from "../models/TransactionModel";
+
+import Transaction from "../models/transactionModel";
+
 import { writeTransactionToDatabase } from "../services/transactionService";
-import Transactions from "../models/transactionModel";
+
 
 export const defaultController = (_req: Request, res: Response) => {
   res.send("Welcome E-move");
@@ -273,12 +275,12 @@ export const resetpassword = async (req: Request, res: Response) => {
       .json({ message: "Password and confirm password are not the same" });
   }
 
-  const verifyToken = jwt.verify(token, secret) as string;
+  const verifyToken = jwt.verify(token, secret) as Record<string, any>;
   if (!verifyToken) {
     return res.status(400).json({ message: "Invalid token" });
   }
 
-  const user = (await doesUserExist({ email: verifyToken })) as UserDataType;
+  const user = (await doesUserExist({ email: verifyToken?.email })) as UserDataType;
   if (!user) {
     return res.status(400).json({ message: "Invalid email address" });
   }
@@ -297,7 +299,7 @@ export const resetpassword = async (req: Request, res: Response) => {
     isVerified: user.isVerified,
   };
 
-  const updateUser = updateUserRecordWithEmail(verifyToken, newUserInfo);
+  const updateUser = updateUserRecordWithEmail(verifyToken.email, newUserInfo);
 
   if (!updateUser) {
     //please retry
@@ -314,12 +316,12 @@ export async function addDriver(req: Request, res: Response) {
 
   console.log(req.body);
   const { token } = req.params;
-  const verifyToken = jwt.verify(token, secret) as string;
+  const verifyToken = jwt.verify(token, secret) as Record<string, any>;
   if (!verifyToken) {
     return res.status(400).json({ message: "Cannot make edit" });
   }
 
-  const user = (await doesUserExist({ email: verifyToken })) as UserDataType;
+  const user = (await doesUserExist({ email: verifyToken.email })) as UserDataType;
   if (!user) {
     return res.status(400).json({ message: "Cannot make edit" });
   }
@@ -374,7 +376,7 @@ export async function addDriver(req: Request, res: Response) {
     },
   };
 
-  const updateUser = updateUserRecordWithEmail(verifyToken, updatedUserInfo);
+  const updateUser = updateUserRecordWithEmail(verifyToken.email, updatedUserInfo);
 
   if (!updateUser) {
     //please retry

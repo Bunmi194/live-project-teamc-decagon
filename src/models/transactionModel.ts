@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 
 const transactionsSchema = new Schema({
   status: {
@@ -23,14 +23,18 @@ const transactionsSchema = new Schema({
     type: "number",
     required: true,
   },
-  // tripId: {
-  //   type: "string",
-  //   required: false,
-  // },
+  processed: { 
+    type: Boolean, 
+    required: false, 
+    },
+   tripId: {
+    type: "string",
+    required: false,
+    },
 });
 
 transactionsSchema.set("timestamps", true);
 
-const Transactions = mongoose.model("Transaction", transactionsSchema);
+const Transaction = mongoose.model("Transaction", transactionsSchema);
 
-export default Transactions;
+export default Transaction;
