@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import { DB_URI } from "../env";
-import jwt from "jsonwebtoken";
 
 const databaseConnection = () => {
   mongoose

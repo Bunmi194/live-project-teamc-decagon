@@ -4,7 +4,8 @@
   "description": "E-Move",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./dist",
+    "start": "node ./dist",
+    "build": "yarn && tsc",
     "compile": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -33,7 +34,9 @@
     "mongoose": "^7.0.0",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.1",
-    "request": "^2.88.2"
+    "requesst": "^0.0.1-security",
+    "request": "^2.88.2",
+    "typescript": "^5.0.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.13",
@@ -44,5 +47,8 @@
     "@types/request": "^2.48.8",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.21"
+  },
+  "engines": {
+    "node": ">=18 <19"
   }
 }

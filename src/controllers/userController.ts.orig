@@ -19,6 +19,11 @@ import {
   deleteDriver,
   findDriver,
 } from "../services/userService";
+<<<<<<< HEAD
+//import Transaction from "../models/TransactionModel";
+=======
+import Transaction from "../models/transactionModel";
+>>>>>>> 48c7ff85e3070469c1f56b5463f6d080824354e9
 import { writeTransactionToDatabase } from "../services/transactionService";
 import Transactions from "../models/TransactionModel";
 

@@ -12,7 +12,7 @@ const route = express.Router();
 
 //add authentication middleware
 route.post("/", routeAuth.body, adminAuthentication, addRoute);
-route.post("/edit", editRouteAuth.body, adminAuthentication, editRoute);
+route.post("/edit/:id", editRouteAuth.body, adminAuthentication, editRoute);
 route.get("/getRoute/:routeId", getRoute);
 route.get("/getAllRoutes", getAvailableRoutes);
 route.get("/getStatistics", getTotalCounts);
