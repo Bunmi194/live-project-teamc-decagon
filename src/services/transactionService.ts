@@ -1,4 +1,4 @@
-import Transaction from "../models/TransactionModel";
+import Transaction from "../models/transactionModel";
 
 export const writeTransactionToDatabase = async (transaction: {}) => {
   const newTransaction = new Transaction(transaction);
