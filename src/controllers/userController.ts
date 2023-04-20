@@ -20,7 +20,7 @@ import {
   findDriver,
 } from "../services/userService";
 
-import Transaction from "../models/TransactionModel";
+import Transaction from "../models/transactionModel";
 
 import { writeTransactionToDatabase } from "../services/transactionService";
 
