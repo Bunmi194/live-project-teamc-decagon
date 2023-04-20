@@ -20,7 +20,7 @@ import {
   findDriver,
 } from "../services/userService";
 
-import Transactions from "../models/TransactionModel";
+import Transaction from "../models/TransactionModel";
 
 import { writeTransactionToDatabase } from "../services/transactionService";
 
@@ -489,7 +489,7 @@ export const getAllDriversController = async (req: Request, res: Response) => {
 
 export const getTransaction = async (req: Request, res: Response) => {
   try {
-    const transaction = await Transactions.find({
+    const transaction = await Transaction.find({
       userId: req.params.userId,
     });
     res.status(200).json({ message: "success", transaction: transaction });

@@ -11,7 +11,7 @@ import {
 } from "../services/userService";
 import Trip from "../models/tripModel";
 import { routeExists } from "../services/routeService";
-import Transactions from "../models/TransactionModel";
+import Transaction from "../models/TransactionModel";
 
 interface UserDataType {
   _id?: string;
@@ -161,7 +161,7 @@ export const BookAtrip = async (req: Request, res: Response) => {
 
   // //create transaction
 
-  const transaction = await Transactions.create({
+  const transaction = await Transaction.create({
     userId: userExist._id,
     tripId: newTrip._id,
     amount: newTrip.price,
