@@ -78,7 +78,7 @@ export const getTripsController = async (req: NewRequest, res: Response) => {
       });
     }
     if (userDetails && userDetails.roles?.includes("passenger")) {
-      const tripCollection = await getAllTripsForPassenger(id);
+      const tripCollection = await getAllTripsForPassenger(`${id}`);
       console.log("tripCollection", tripCollection);
       return res.status(200).json({
         message: "success",
