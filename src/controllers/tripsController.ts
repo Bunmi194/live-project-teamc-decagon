@@ -48,19 +48,28 @@ export const getTripsController = async (req: NewRequest, res: Response) => {
 
   jwt.verify(`${token}`, `${JWT_SECRET}`, async (err, result: any) => {
     if (err) {
+      console.log("Error: ", err);
       return res.status(400).json({
         message: "Bad request",
         data: err,
       });
     }
-    const id = result?.id;
-    if (!id) {
+    const email = result?.email;
+    // console.log("result: ", result);
+    if (!email) {
       return res.status(400).json({
         message: "Bad request",
       });
     }
-    const userDetails = (await doesUserExist({ id: id })) as UserDataType;
+    const userDetails = (await doesUserExist({ email: email })) as UserDataType;
+    // console.log("userDetails: ", userDetails);
+    const id = userDetails?._id;
 
+    if(!userDetails){
+      return res.status(400).json({
+        message: "Bad request",
+      });
+    }
     if (userDetails && userDetails.roles?.includes("admin")) {
       const tripCollections = await getAllTripsForAdmin();
       return res.status(200).json({
