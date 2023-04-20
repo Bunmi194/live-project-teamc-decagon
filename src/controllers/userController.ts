@@ -19,8 +19,11 @@ import {
   deleteDriver,
   findDriver,
 } from "../services/userService";
-import Transaction from "../models/transactionModel";
+
+import Transactions from "../models/transactionModel";
+
 import { writeTransactionToDatabase } from "../services/transactionService";
+
 
 export const defaultController = (_req: Request, res: Response) => {
   res.send("Welcome E-move");
@@ -484,24 +487,20 @@ export const getAllDriversController = async (req: Request, res: Response) => {
   return res.status(200).json({ drivers });
 };
 
+export const getTransaction = async (req: Request, res: Response) => {
+  try {
+    const transaction = await Transactions.find({
+      userId: req.params.userId,
+    });
+    res.status(200).json({ message: "success", transaction: transaction });
+  } catch (error) {
+    res.send({
+      status: "An error occured",
+      message: "Data not found",
+    });
+  }
+};
 
-export const getTransaction = async (
-  req: Request,
-  res: Response,
-  ) => {
-    try{
-      const transaction = await Transaction.find({
-        userId: req.params.userId,
-      });
-      res.status(200).json({message:"success",transaction: transaction});
-    } catch (error) {
-      res.send({
-        status: "An error occured",
-        message: "Data not found",
-      });
-    }
-  };
-  
 export const fundWalletController = async (req: Request, res: Response) => {
   let form = _.pick(req.body, ["amount", "email", "full_name", "metadata", "callback_url"]);
   // const { amount, email, full_name } = req.body
@@ -513,8 +512,10 @@ export const fundWalletController = async (req: Request, res: Response) => {
   };
   console.log(form.metadata);
   form.amount *= 100;
-  form.callback_url = process.env.PAYSTACK_CALLBACK;
+  form.callback_url = `${process.env.PAYSTACK_CALLBACK}`;
+
   console.log("form callback_url: ", form.callback_url)
+
   initializePayment(form, (error: any, body: any) => {
     if (error) {
       //handle errors
@@ -600,13 +601,33 @@ export const payStackCallback = async (req: Request, res: Response) => {
 
     const transaction = await writeTransactionToDatabase(newTransaction);
 
-    const updateUser = await updateUserRecordWithEmail(user.email!, updatedUserInfo);
+    const updateUser = await updateUserRecordWithEmail(
+      user.email!,
+      updatedUserInfo
+    );
 
     if (!updateUser && !transaction) {
       //please retry
       return res.status(500).json({ message: "Please try again" });
     }
 
-    return res.status(200).json({ message: "Success", user : updateUser});
+    return res.status(200).json({ message: "Success", user: updateUser });
   });
 };
+
+export const userRecord = async (req: Request, res:Response) => {
+  const userId = req.params.id;
+  console.log("userId: ", userId)
+  if(typeof userId !== "string"){
+    return res.status(404).json({
+      message: "Bad Request"
+    })
+  }
+  const user = await doesUserExist({ id: userId }) as UserDataType;
+  console.log("user: ", user)
+  return res.status(200).json({
+    message: "user fetched",
+    user
+  })
+
+}
