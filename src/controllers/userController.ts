@@ -19,9 +19,11 @@ import {
   deleteDriver,
   findDriver,
 } from "../services/userService";
-//import Transaction from "../models/TransactionModel";
+
+// import Transactions from "../models/TransactionModel";
+
 import { writeTransactionToDatabase } from "../services/transactionService";
-import Transactions from "../models/transactionModel";
+
 
 export const defaultController = (_req: Request, res: Response) => {
   res.send("Welcome E-move");
@@ -273,12 +275,12 @@ export const resetpassword = async (req: Request, res: Response) => {
       .json({ message: "Password and confirm password are not the same" });
   }
 
-  const verifyToken = jwt.verify(token, secret) as string;
+  const verifyToken = jwt.verify(token, secret) as Record<string, any>;
   if (!verifyToken) {
     return res.status(400).json({ message: "Invalid token" });
   }
 
-  const user = (await doesUserExist({ email: verifyToken })) as UserDataType;
+  const user = (await doesUserExist({ email: verifyToken?.email })) as UserDataType;
   if (!user) {
     return res.status(400).json({ message: "Invalid email address" });
   }
@@ -297,7 +299,7 @@ export const resetpassword = async (req: Request, res: Response) => {
     isVerified: user.isVerified,
   };
 
-  const updateUser = updateUserRecordWithEmail(verifyToken, newUserInfo);
+  const updateUser = updateUserRecordWithEmail(verifyToken.email, newUserInfo);
 
   if (!updateUser) {
     //please retry
@@ -314,12 +316,12 @@ export async function addDriver(req: Request, res: Response) {
 
   console.log(req.body);
   const { token } = req.params;
-  const verifyToken = jwt.verify(token, secret) as string;
+  const verifyToken = jwt.verify(token, secret) as Record<string, any>;
   if (!verifyToken) {
     return res.status(400).json({ message: "Cannot make edit" });
   }
 
-  const user = (await doesUserExist({ email: verifyToken })) as UserDataType;
+  const user = (await doesUserExist({ email: verifyToken.email })) as UserDataType;
   if (!user) {
     return res.status(400).json({ message: "Cannot make edit" });
   }
@@ -374,7 +376,7 @@ export async function addDriver(req: Request, res: Response) {
     },
   };
 
-  const updateUser = updateUserRecordWithEmail(verifyToken, updatedUserInfo);
+  const updateUser = updateUserRecordWithEmail(verifyToken.email, updatedUserInfo);
 
   if (!updateUser) {
     //please retry
@@ -495,7 +497,7 @@ export const getTransaction = async (req: Request, res: Response) => {
 };
 
 export const fundWalletController = async (req: Request, res: Response) => {
-  let form = _.pick(req.body, ["amount", "email", "full_name", "metadata"]);
+  let form = _.pick(req.body, ["amount", "email", "full_name", "metadata", "callback_url"]);
   // const { amount, email, full_name } = req.body
   // const form = {amount, email, full_name}
   console.log(form);
@@ -505,6 +507,8 @@ export const fundWalletController = async (req: Request, res: Response) => {
   };
   console.log(form.metadata);
   form.amount *= 100;
+  form.callback_url = `${process.env.PAYSTACK_CALLBACK}`;
+
   initializePayment(form, (error: any, body: any) => {
     if (error) {
       //handle errors
