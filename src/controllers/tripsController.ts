@@ -5,7 +5,13 @@ import {
   getAllTripsForAdmin,
   getAllTripsForPassenger,
 } from "../services/tripServices";
-import { doesUserExist } from "../services/userService";
+import {
+  doesUserExist,
+  updateUserRecordWithEmail,
+} from "../services/userService";
+import Trip from "../models/tripModel";
+import { routeExists } from "../services/routeService";
+import Transaction from "../models/TransactionModel";
 
 interface UserDataType {
   _id?: string;
@@ -23,6 +29,7 @@ interface UserDataType {
   accountNumber?: string;
   validID?: string;
   photo?: string;
+  wallet_balance?: number;
 }
 
 export interface NewRequest extends Request {
@@ -72,5 +79,99 @@ export const getTripsController = async (req: NewRequest, res: Response) => {
     return res.status(500).json({
       message: "Internal Server Error",
     });
+  });
+};
+
+export const createTrip = async (data: {}) => {
+  const trip = new Trip(data);
+  return trip
+    .save()
+    .then((data: any) => {
+      return data;
+    })
+    .catch((err: any) => {
+      console.log("Error: ", err);
+      return false;
+    });
+};
+
+export const BookAtrip = async (req: Request, res: Response) => {
+  //get user id
+  const { userId, routeId } = req.body;
+  //get route id
+  // const { routeId } = req.params;
+
+  console.log("Details: ", routeId, userId);
+  console.log("req body: ", req.body);
+  console.log("Details: ", typeof(routeId), typeof(userId));
+
+  if(typeof userId !== "string" || typeof routeId !== "string"){
+    return res.status(404).json({
+      message: "Bad Request",
+    });
+  }
+
+  //check if user exists
+  const userExist = (await doesUserExist({ id: userId })) as UserDataType;
+  if (!userExist) {
+    return res.status(404).json({
+      message: "User does not exist",
+    });
+  }
+
+  //check if route exists
+  const doesRouteExist = await routeExists(routeId);
+
+  if (!doesRouteExist) {
+    return res.status(404).json({
+      message: "Route does not exist",
+    });
+  }
+  //create trip
+  const tripDetails = {
+    userId: userId,
+    routeId: routeId,
+    status: false,
+    price: doesRouteExist.price,
+    completed: false
+  };
+
+  const newTrip = await Trip.create(tripDetails);
+
+  if (!newTrip) {
+    return res.status(500).json({
+      message: "Something went wrong",
+    });
+  }
+
+  if (userExist.wallet_balance! && userExist.wallet_balance! < newTrip.price) {
+    return res.status(400).json({
+      message: "Insufficient balance",
+    });
+  }
+
+  const updatedUserInfo = {
+    wallet_balance: userExist.wallet_balance! - newTrip.price,
+  };
+
+  const updatedUser = await updateUserRecordWithEmail(
+    userExist.email!,
+    updatedUserInfo
+  );
+
+  // //create transaction
+
+  const transaction = await Transaction.create({
+    userId: userExist._id,
+    tripId: newTrip._id,
+    amount: newTrip.price,
+    status: "success",
+    transactionType: "debit",
+  });
+
+  await Trip.findByIdAndUpdate(newTrip._id, { trxn_ref: transaction._id});
+  return res.status(201).json({
+    message: "Trip created successfully",
+    trip: newTrip,
   });
 };

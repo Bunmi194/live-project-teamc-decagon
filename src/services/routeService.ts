@@ -7,7 +7,18 @@ interface routeDataType {
   price?: number;
 }
 
-export const routeExists = async (data: {}) => {
+export const routeExists = async (id: string) => {
+  try {
+    const data = await Route.findById(id);
+    return data;
+    
+  } catch (error) {
+    console.log("Error: ", error);
+    return null;  
+  } 
+};
+
+export const routeExistNEW = async (data: {}) => {
   return Route.find(data)
     .then((data) => {
       return data;
