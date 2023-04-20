@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const transactionsSchema = new Schema({
+const transactionsSchema = new mongoose.Schema({
   status: {
     type: "string",
     enum: ["success", "failed"],
@@ -35,6 +35,6 @@ const transactionsSchema = new Schema({
 
 transactionsSchema.set("timestamps", true);
 
-const Transaction = mongoose.model("Transaction", transactionsSchema);
+//const Transaction = mongoose.model("Transaction", transactionsSchema);
 
-export default Transaction;
+export default (mongoose.model("Transaction", transactionsSchema));

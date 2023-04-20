@@ -11,7 +11,7 @@ import {
 } from "../services/userService";
 import Trip from "../models/tripModel";
 import { routeExists } from "../services/routeService";
-import Transactions from "../models/transactionModel";
+import Transactions from "../models/TransactionModel";
 
 interface UserDataType {
   _id?: string;
