@@ -113,6 +113,7 @@ export const signUp = async (req: Request, res: Response) => {
     return res.status(201).json({
       User,
       message: "User created successfully",
+      token,
       success: true,
     });
   } catch (error) {
@@ -221,19 +222,19 @@ export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const user = (await doesUserExist({ email })) as UserDataType;
   if (!user) {
-    return res.status(400).json({ message: "Invalid email address" });
+    return res.status(400).json({ message: "Invalid email address or password" });
   }
 
   const isMatch = bcrypt.compareSync(password, user.password!);
   console.log(isMatch);
   if (!isMatch) {
-    return res.status(400).json({ message: "Invalid password" });
+    return res.status(400).json({ message: "Invalid email address or password" });
   }
   if (!user.isVerified) {
     return res.status(400).json({ message: "Please verify your email" });
   }
   const token = jwt.sign({ email: user.email }, secret, { expiresIn: "1h" });
-  return res.status(200).json({ token });
+  return res.status(200).json({ token, user });
 };
 
 export const forgotPassword = async (req: Request, res: Response) => {
@@ -268,7 +269,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 export const resetpassword = async (req: Request, res: Response) => {
   const { password, confirmPassword } = req.body;
   const { token } = req.params;
-
+  console.log("Checkout")
   if (password !== confirmPassword) {
     return res
       .status(400)
@@ -276,11 +277,15 @@ export const resetpassword = async (req: Request, res: Response) => {
   }
 
   const verifyToken = jwt.verify(token, secret) as Record<string, any>;
+  const email = jwt.verify(token, secret) as unknown as string;
   if (!verifyToken) {
     return res.status(400).json({ message: "Invalid token" });
   }
 
-  const user = (await doesUserExist({ email: verifyToken?.email })) as UserDataType;
+  const user = (await doesUserExist({ email })) as UserDataType;
+  console.log("user: ", user);
+  console.log("Email: ", verifyToken?.email);
+  console.log("verifyToken: ", verifyToken);
   if (!user) {
     return res.status(400).json({ message: "Invalid email address" });
   }
@@ -299,7 +304,7 @@ export const resetpassword = async (req: Request, res: Response) => {
     isVerified: user.isVerified,
   };
 
-  const updateUser = updateUserRecordWithEmail(verifyToken.email, newUserInfo);
+  const updateUser = updateUserRecordWithEmail(email, newUserInfo);
 
   if (!updateUser) {
     //please retry
@@ -508,6 +513,8 @@ export const fundWalletController = async (req: Request, res: Response) => {
   console.log(form.metadata);
   form.amount *= 100;
   form.callback_url = `${process.env.PAYSTACK_CALLBACK}`;
+
+  console.log("form callback_url: ", form.callback_url)
 
   initializePayment(form, (error: any, body: any) => {
     if (error) {
