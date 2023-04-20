@@ -503,7 +503,7 @@ export const getTransaction = async (
   };
   
 export const fundWalletController = async (req: Request, res: Response) => {
-  let form = _.pick(req.body, ["amount", "email", "full_name", "metadata"]);
+  let form = _.pick(req.body, ["amount", "email", "full_name", "metadata", "callback_url"]);
   // const { amount, email, full_name } = req.body
   // const form = {amount, email, full_name}
   console.log(form);
@@ -513,6 +513,8 @@ export const fundWalletController = async (req: Request, res: Response) => {
   };
   console.log(form.metadata);
   form.amount *= 100;
+  form.callback_url = process.env.PAYSTACK_CALLBACK;
+  console.log("form callback_url: ", form.callback_url)
   initializePayment(form, (error: any, body: any) => {
     if (error) {
       //handle errors
