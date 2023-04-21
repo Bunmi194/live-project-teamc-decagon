@@ -147,6 +147,7 @@ export const adminAuthentication = async (
       const resultNew = result as JwtPayload;
       const id = resultNew?.id;
       console.log("id: ", id);
+      console.log("resultNew: ", resultNew);
       if (!result || !id) {
         res.status(400).json({
           message: "Bad RequestA",
