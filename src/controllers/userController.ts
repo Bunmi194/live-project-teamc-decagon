@@ -221,19 +221,21 @@ export const changePassword = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const user = (await doesUserExist({ email })) as UserDataType;
+  // console.log("user: ", user);
   if (!user) {
     return res.status(400).json({ message: "Invalid email address or password" });
   }
 
   const isMatch = bcrypt.compareSync(password, user.password!);
-  console.log(isMatch);
+  // console.log(isMatch);
   if (!isMatch) {
     return res.status(400).json({ message: "Invalid email address or password" });
   }
   if (!user.isVerified) {
     return res.status(400).json({ message: "Please verify your email" });
   }
-  const token = jwt.sign({ email: user.email }, secret, { expiresIn: "1h" });
+  const token = jwt.sign({ email: user.email, id: user._id }, secret, { expiresIn: "24h" });
+  // console.log("token: ", token)
   return res.status(200).json({ token, user });
 };
 
