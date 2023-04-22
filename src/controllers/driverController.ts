@@ -97,11 +97,13 @@ export async function addDriver(req: Request, res: Response) {
   }
 
   export async function editDriverDetails(req: Request, res: Response){
+    console.log("editDriverDetails")
     const rawToken = req.headers.authorization as string;
     const token = rawToken?.split(' ')[1] as string;
     const id = req.params.id;
     const data = req.body as DriverDataType;
     console.log("token: ", token);
+    console.log("req body: ", data);
     if(!token || !id){
         return res.status(400).json({ message: "Bad Request"});
     }
