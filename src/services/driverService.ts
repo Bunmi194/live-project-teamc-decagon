@@ -54,4 +54,91 @@
 //   }
 // };
 
+import Driver from "../models/driverModel";
 
+interface photoData{
+    public_id: String,
+    url: String
+}
+
+interface DriverDataType {
+  _id?: string;
+  fullName?: string;
+  routeOfOperation?: string;
+  phoneNumber?: string;
+  accountNumber?: string;
+  validID?: photoData;
+  photo?: photoData;
+}
+
+export const doesDriverExist = (data: { fullName?: string; phoneNumber?: string }) => {
+    if (data.fullName && data.phoneNumber) {
+      return new Promise((resolve) => {
+        const driver = Driver.findOne({ fullName: data.fullName, phoneNumber: data.phoneNumber }) as DriverDataType;
+        resolve(driver);
+      });
+    }
+    return null;
+  };
+
+export const editDriver = (id:string, data: DriverDataType) => {
+    const driver = Driver.findById(id) as DriverDataType;
+    if(!driver){
+        return res.status(400).json({
+            message: "Driver not found"
+        })
+    }
+    if (data) {
+      return new Promise((resolve) => {
+        const driver = Driver.findByIdAndUpdate(id, data) as DriverDataType;
+        resolve(driver);
+      });
+    }
+    return null;
+  };
+
+export const deleteDriver = (id:string) => {
+    if(!id){
+        return res.status(400).json({message: "Driver not found"});
+    }
+    
+    return new Promise((resolve) => {
+    const driver = Driver.findByIdAndDelete(id);
+    resolve(driver);
+    });
+
+    return null;
+  };
+
+  export const writeDriverToDatabase = async (driver: {}) => {
+    const newDriver = new Driver(driver);
+    return newDriver
+      .save()
+      .then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        console.log("Error: ", err);
+        return false;
+      });
+  };
+
+  export const getAllDrivers = async () => {
+    try {
+      const drivers = await Driver.find();
+      return drivers;
+    } catch (error) {
+      console.log("Error: ",error);
+      return false;
+    }
+  };
+
+  export const countDrivers = async () => {
+    try {
+      const drivers = await Driver.find().count();
+      return drivers;
+    } catch (error) {
+      console.log("Error: ",error);
+      return false;
+    }
+  };

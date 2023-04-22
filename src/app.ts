@@ -6,14 +6,21 @@ import { route  as routeRouter } from './routes/routeRoutes';
 import dotenv from "dotenv";
 import morgan from "morgan";
 import cors from "cors";
+import bodyParser from 'body-parser';
+
 
 //import databaseConnection from "./config/config";
 
 dotenv.config();
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true, limit: "10mb" }));
+app.use(bodyParser.json({limit: "10mb"}));
+
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
+
+
 
 app.use(cors({
     origin: '*',

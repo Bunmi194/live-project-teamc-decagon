@@ -83,6 +83,16 @@ export const getAllUsers = async () => {
   }
 };
 
+export const getAllUsersCount = async () => {
+  try {
+    const usersCount = await User.find().count();
+    return usersCount;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 export const findDriver = async (id: string) => {
   const driver = await User.find({ _id: id, roles: "driver" });
   if (!driver) {
