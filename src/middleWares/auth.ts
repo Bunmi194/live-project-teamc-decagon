@@ -139,15 +139,17 @@ export const adminAuthentication = async (
 ) => {
   //get and validate token
   const { authorization } = req.headers;
+  console.log("authorization: ", authorization)
   const token = authorization?.split(" ")[1] as string;
   const validateToken = jwt.verify(
     `${token}`,
     `${JWT_SECRET}`,
-    async (request, result) => {
+    async (error, result) => {
+      console.log("Result: ", result)
+      console.log("error: ", error)
       const resultNew = result as JwtPayload;
       const id = resultNew?.id;
       console.log("id: ", id);
-      console.log("resultNew: ", resultNew);
       if (!result || !id) {
         res.status(400).json({
           message: "Bad RequestA",

@@ -18,6 +18,7 @@ import {
   getAllUsers,
   deleteDriver,
   findDriver,
+  getAllUsersCount
 } from "../services/userService";
 
 import Transaction from "../models/transactionModel";
@@ -315,82 +316,97 @@ export const resetpassword = async (req: Request, res: Response) => {
   return res.status(200).json({ message: "Password changed" });
 };
 
-export async function addDriver(req: Request, res: Response) {
-  const { phoneNumber, accountNumber, validID, photo } = req.body;
-  let cloudImagePhoto: any;
-  let cloudImageValidID: any;
-  //const photo = req.file?.path;
-
-  console.log(req.body);
-  const { token } = req.params;
-  const verifyToken = jwt.verify(token, secret) as Record<string, any>;
-  if (!verifyToken) {
-    return res.status(400).json({ message: "Cannot make edit" });
+export async function getAllUsersCountDetails(req: Request, res: Response){
+  const userCount = await getAllUsersCount();
+  if(!userCount){
+    return res.status(500).json({
+      message: "Internal Server Error"
+    })
   }
-
-  const user = (await doesUserExist({ email: verifyToken.email })) as UserDataType;
-  if (!user) {
-    return res.status(400).json({ message: "Cannot make edit" });
-  }
-
-  if (user.roles?.includes("driver")) {
-    return res.status(400).json({ message: "Already a driver" });
-  }
-
-  if (user.driverStatus == "verified" || user.driverStatus == "pending") {
-    return res
-      .status(400)
-      .json({ message: "Cannot make request at this moment" });
-  }
-
-  if (
-    (!photo && !validID && !phoneNumber) ||
-    (!user.photo && !user.validID && !user.phoneNumber)
-  ) {
-    return res
-      .status(400)
-      .json({ message: "All fields are required to be a driver" });
-  }
-
-  cloudImagePhoto = await cloudUpload.uploader.upload(photo!, {
-    folder: "emove/photos",
-  });
-
-  cloudImageValidID = await cloudUpload.uploader.upload(validID, {
-    folder: "emove/validID",
-  });
-
-  const updatedUserInfo = {
-    _id: user._id,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    password: user.password,
-    dateOfBirth: user.dateOfBirth,
-    gender: user.gender,
-    isVerified: user.isVerified,
-    phoneNumber,
-    accountNumber,
-    driverStatus: "pending",
-    photo: {
-      public_id: cloudImagePhoto!.public_id,
-      url: cloudImagePhoto.secure_url,
-    },
-
-    validID: {
-      public_id: cloudImageValidID.public_id,
-      url: cloudImageValidID.secure_url,
-    },
-  };
-
-  const updateUser = updateUserRecordWithEmail(verifyToken.email, updatedUserInfo);
-
-  if (!updateUser) {
-    //please retry
-    return res.status(500).json({ message: "Please try again" });
-  }
-  return res.status(200).json({ message: "Request to be a driver in review" });
+  return res.status(200).json({
+    message: "User Count",
+    userCount
+  })
 }
+
+// export async function addDriver(req: Request, res: Response) {
+//   const { fullName, routeOfOperation, phoneNumber, accountNumber, validID, photo } = req.body;
+//   let cloudImagePhoto: any;
+//   let cloudImageValidID: any;
+//   //const photo = req.file?.path;
+
+
+//   if(!fullName || !routeOfOperation || !phoneNumber || !accountNumber || !validID || !photo){
+//     return res.status(400).json({ message: "Bad Request" });
+//   }
+
+//   console.log("req body: ",req.body);
+//   const token  = req.headers.authorization;
+//   console.log("token: ", token);
+//   const verifyToken = jwt.verify(`${token}`, `${secret}`) as Record<string, any>;
+//   console.log("verifyToken: ", verifyToken);
+
+//   if (!verifyToken) {
+//     return res.status(400).json({ message: "Bad Request" });
+//   }
+
+//   // const user = (await doesUserExist({ email: verifyToken.email })) as UserDataType;
+//   // if (!user) {
+//   //   return res.status(400).json({ message: "Cannot make edit" });
+//   // }
+
+//   // if (user.roles?.includes("driver")) {
+//   //   return res.status(400).json({ message: "Already a driver" });
+//   // }
+
+//   // if (user.driverStatus == "verified" || user.driverStatus == "pending") {
+//   //   return res
+//   //     .status(400)
+//   //     .json({ message: "Cannot make request at this moment" });
+//   // }
+
+//   // if (
+//   //   (!photo && !validID && !phoneNumber) ||
+//   //   (!user.photo && !user.validID && !user.phoneNumber)
+//   // ) {
+//   //   return res
+//   //     .status(400)
+//   //     .json({ message: "All fields are required to be a driver" });
+//   // }
+
+//   cloudImagePhoto = await cloudUpload.uploader.upload(photo!, {
+//     folder: "emove/photos",
+//   });
+
+//   cloudImageValidID = await cloudUpload.uploader.upload(validID, {
+//     folder: "emove/validID",
+//   });
+
+//   const driverUserInfo = {
+//     fullName,
+//     routeOfOperation,
+//     phoneNumber,
+//     accountNumber,
+//     driverStatus: "pending",
+//     photo: {
+//       public_id: cloudImagePhoto!.public_id,
+//       url: cloudImagePhoto.secure_url,
+//     },
+//     validID: {
+//       public_id: cloudImageValidID.public_id,
+//       url: cloudImageValidID.secure_url,
+//     },
+//   };
+
+//   //write driver to db
+//   const updateUser = updateUserRecordWithEmail(verifyToken.email, updatedUserInfo);
+
+//   if (!updateUser) {
+//     //please retry
+//     return res.status(500).json({ message: "Please try again" });
+//   }
+//   return res.status(200).json({ message: "Driver added" });
+// }
 
 export async function editDriver(req: Request, res: Response) {
   const { id } = req.params;
@@ -477,17 +493,17 @@ export const getOneDriverController = async (req: Request, res: Response) => {
   return res.status(200).json({ driver });
 };
 
-export const getAllDriversController = async (req: Request, res: Response) => {
-  const users = await getAllUsers();
-  if (!users) {
-    return res.status(400).json({ message: "No user found" });
-  }
-  const drivers = users.filter((user) => user.roles.includes("driver"));
-  if (!drivers) {
-    return res.status(400).json({ message: "No driver found" });
-  }
-  return res.status(200).json({ drivers });
-};
+// export const getAllDriversController = async (req: Request, res: Response) => {
+//   const users = await getAllUsers();
+//   if (!users) {
+//     return res.status(400).json({ message: "No user found" });
+//   }
+//   const drivers = users.filter((user) => user.roles.includes("driver"));
+//   if (!drivers) {
+//     return res.status(400).json({ message: "No driver found" });
+//   }
+//   return res.status(200).json({ drivers });
+// };
 
 export const getTransaction = async (req: Request, res: Response) => {
   try {

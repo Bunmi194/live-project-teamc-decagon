@@ -64,6 +64,8 @@ export const addRoute = async (req: Request, res: Response) => {
 export const editRoute = async (req: Request, res: Response) => {
   //get route id
   // const { routeId } = req.headers;
+  console.log("req body: ", req.body);
+  // console.log("req body: ", req.body);
   const { price } = req.body;
   const id: string = req.params['id'] as unknown as string; 
   //check if route exists

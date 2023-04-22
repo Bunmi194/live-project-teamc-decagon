@@ -5,14 +5,15 @@ import {
   signUp,
   forgotPassword,
   resetpassword,
-  addDriver,
   editDriver,
   deleteDriverController,
   fundWalletController,
   payStackCallback,
   getTransaction,
-  userRecord
+  userRecord,
+  getAllUsersCountDetails
 } from "../controllers/userController";
+import { addDriver, sendAllDrivers, editDriverDetails, deleteDriverDetails, countDriverDetails } from "../controllers/driverController";
 import {
   signUpAuth,
   loginAuth,
@@ -27,7 +28,6 @@ import { verifyEmail } from "../controllers/userController";
 import { Upload } from "../middleWares/imageUpload";
 import {
   changePassword,
-  getAllDriversController,
   getOneDriverController,
 } from "../controllers/userController";
 import { addRoute, editRoute } from "../controllers/routeController";
@@ -44,23 +44,28 @@ route.post("/login", loginAuth.body, login);
 
 route.get("/verify/:token", verifyEmail);
 route.get("/user/:id", userRecord);
+route.get("/passengers/count", adminAuthentication, getAllUsersCountDetails);
+
+route.get("/drivers/count", adminAuthentication, countDriverDetails);
 
 route.post("/forgotpassword", forgotPasswordAuth.body, forgotPassword);
 
 route.post("/resetpassword/:token", resetPasswordAuth.body, resetpassword);
 route.post("/change-password", changePassword);
 
-route.get("/drivers", getAllDriversController);
+route.get("/drivers", adminAuthentication, sendAllDrivers);
 route.get("/driver/:id", getOneDriverController);
-route.delete("/deleteDriver/:id", deleteDriverController);
+
+route.delete("/delete-driver/:id", adminAuthentication, deleteDriverDetails);
+
+route.post("/add-driver", adminAuthentication, addDriver);
+route.put("/edit-driver/:id", adminAuthentication, editDriverDetails);
 
 route.get("/transaction/:userId", getTransaction);
 
 //routes for bus route
 // route.post("/v1/route", routeAuth.body, adminAuthentication, addRoute);
 // route.post("/v1/route/edit", editRouteAuth.body, adminAuthentication, editRoute);
-route.post("/v1/add-driver/:token", addDriver);
-route.post("/v1/edit-driver/:id", editDriver);
 
 route.get("/trips", getTripsController);
 
