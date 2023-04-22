@@ -81,12 +81,10 @@ export const doesDriverExist = (data: { fullName?: string; phoneNumber?: string 
     return null;
   };
 
-export const editDriver = (id:string, data: DriverDataType) => {
+export const editDriver = (id:string, data: any) => {
     const driver = Driver.findById(id) as DriverDataType;
     if(!driver){
-        return res.status(400).json({
-            message: "Driver not found"
-        })
+        return false;
     }
     if (data) {
       return new Promise((resolve) => {
@@ -99,7 +97,7 @@ export const editDriver = (id:string, data: DriverDataType) => {
 
 export const deleteDriver = (id:string) => {
     if(!id){
-        return res.status(400).json({message: "Driver not found"});
+        return false;
     }
     
     return new Promise((resolve) => {

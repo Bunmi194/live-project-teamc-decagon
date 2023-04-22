@@ -114,7 +114,7 @@ export async function addDriver(req: Request, res: Response) {
     const driver = await editDriver(id, data);
     if(!driver){
         return res.status(500).json({
-            message: "Internal Server Error";
+            message: "Internal Server Error"
         })
     }
     return res.status(200).json({
@@ -140,7 +140,7 @@ export async function addDriver(req: Request, res: Response) {
     const driver = await deleteDriver(id);
     if(!driver){
         return res.status(500).json({
-            message: "Internal Server Error";
+            message: "Internal Server Error"
         })
     }
     return res.status(200).json({
@@ -167,7 +167,7 @@ export async function addDriver(req: Request, res: Response) {
     return res.status(200).json({ message: "Successful", countOfDrivers})
 
   }
-  
+
 //   export async function editDriver(req: Request, res: Response) {
 //   const { id } = req.params;
 //   const { routeOfOperation, accountNumber, photo, validID } = req.body;
