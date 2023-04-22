@@ -82,21 +82,26 @@ export const doesDriverExist = (data: { fullName?: string; phoneNumber?: string 
   };
 
 export const editDriver = (id:string, data: any) => {
-    const driver = Driver.findById(id) as DriverDataType;
-    if(!driver){
-        return false;
+    try{
+        const driver = Driver.findById(id) as DriverDataType;
+      if(!driver){
+          return false;
+      }
+      if (data) {
+        return new Promise((resolve) => {
+          const driver = Driver.findByIdAndUpdate(id, data) as DriverDataType;
+          resolve(driver);
+        });
+      }
+      return null;
+    }catch(err){
+      return err;
     }
-    if (data) {
-      return new Promise((resolve) => {
-        const driver = Driver.findByIdAndUpdate(id, data) as DriverDataType;
-        resolve(driver);
-      });
-    }
-    return null;
   };
 
 export const deleteDriver = (id:string) => {
-    if(!id){
+    try{
+      if(!id){
         return false;
     }
     
@@ -106,6 +111,9 @@ export const deleteDriver = (id:string) => {
     });
 
     return null;
+    }catch(err){
+      return err;
+    }
   };
 
   export const writeDriverToDatabase = async (driver: {}) => {
