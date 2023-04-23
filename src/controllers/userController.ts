@@ -509,7 +509,7 @@ export const getTransaction = async (req: Request, res: Response) => {
   try {
     const transaction = await Transaction.find({
       userId: req.params.userId,
-    });
+    }).sort({createdAt: -1});
     res.status(200).json({ message: "success", transaction: transaction });
   } catch (error) {
     res.send({

@@ -69,6 +69,11 @@ export const getAllTripsForPassenger = async (passengerID: string) => {
         as: "driver",
       },
     },
+    {
+      $sort: {
+        createdAt: -1
+      }
+    }
   ])
     .then((collection) => {
       return collection;
