@@ -52,7 +52,7 @@ app.use(morgan('combined'));
 passport.use(new GoogleStrategy({
     clientID: '438019500256-bedaq8kmin6s0inlm66s7tge856fkq8k.apps.googleusercontent.com',
     clientSecret: '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',
-    callbackURL: `${APP_URL}/google`
+    callbackURL: `${APP_URL}google`
   },
   async function(accessToken, refreshToken, profile, done) {
     console.log("here")
@@ -112,7 +112,7 @@ app.get('/google', function(req, res, next) {
     console.log("GOOGLE_REDIRECT: ", GOOGLE_REDIRECT)
     //https://emove-teamc.netlify.app/#
     //${GOOGLE_REDIRECT}/#/auth/google
-    res.redirect(`${GOOGLE_REDIRECT}/#/auth/google/?token=${token}&dateOfBirth=${dateOfBirth}&driverStatus=${driverStatus}&email=${email}&firstName=${firstName}&gender=${gender}&isVerified=${isVerified}&lastName=${lastName}&password=encrypted&roles=${roles}&wallet_balance=${wallet_balance}&routeOfOperation=${routeOfOperation}&_id=${_id}`);
+    res.redirect(`${GOOGLE_REDIRECT}#/auth/google/?token=${token}&dateOfBirth=${dateOfBirth}&driverStatus=${driverStatus}&email=${email}&firstName=${firstName}&gender=${gender}&isVerified=${isVerified}&lastName=${lastName}&password=encrypted&roles=${roles}&wallet_balance=${wallet_balance}&routeOfOperation=${routeOfOperation}&_id=${_id}`);
     // return res.status(200).json({message: "Success"})
   });
   //http://localhost:3000/#/auth/google
