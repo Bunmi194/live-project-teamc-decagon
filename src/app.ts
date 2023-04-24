@@ -12,7 +12,7 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 import cors from "cors";
 import bodyParser from 'body-parser';
-import { GOOGLE_REDIRECT } from "./env";
+import { GOOGLE_REDIRECT, APP_URL } from "./env";
 
 
 //import databaseConnection from "./config/config";
@@ -52,7 +52,7 @@ app.use(morgan('combined'));
 passport.use(new GoogleStrategy({
     clientID: '438019500256-bedaq8kmin6s0inlm66s7tge856fkq8k.apps.googleusercontent.com',
     clientSecret: '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',
-    callbackURL: 'https://emove-teamc-new.onrender.com/google'
+    callbackURL: `${APP_URL}/google`
   },
   async function(accessToken, refreshToken, profile, done) {
     console.log("here")
@@ -77,6 +77,7 @@ passport.deserializeUser(function(user:any, done) {
 });
 
 app.get('/auth/google', function (req,res, next){
+    console.log("GOOGLE_REDIRECT: ", GOOGLE_REDIRECT)
     console.log(`Loading API library`);
     next();
 },
@@ -108,7 +109,9 @@ app.get('/google', function(req, res, next) {
     const wallet_balance = details.user.wallet_balance;
     const routeOfOperation = details.user.routeOfOperation;
     const _id = details.user._id;
+    console.log("GOOGLE_REDIRECT: ", GOOGLE_REDIRECT)
     //https://emove-teamc.netlify.app/#
+    //${GOOGLE_REDIRECT}/#/auth/google
     res.redirect(`${GOOGLE_REDIRECT}/#/auth/google/?token=${token}&dateOfBirth=${dateOfBirth}&driverStatus=${driverStatus}&email=${email}&firstName=${firstName}&gender=${gender}&isVerified=${isVerified}&lastName=${lastName}&password=encrypted&roles=${roles}&wallet_balance=${wallet_balance}&routeOfOperation=${routeOfOperation}&_id=${_id}`);
     // return res.status(200).json({message: "Success"})
   });
