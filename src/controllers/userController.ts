@@ -240,6 +240,29 @@ export const login = async (req: Request, res: Response) => {
   return res.status(200).json({ token, user });
 };
 
+//googleAuthLogin
+export const googleAuthLogin = async (email: string) => {
+  let response:any;
+  const user = (await doesUserExist({ email })) as UserDataType;
+  // console.log("user: ", user);
+  if (!user) {
+    response = "User does not exist"
+  }
+
+  if (!user.isVerified) {
+    response = "Please verify your email";
+  }
+  const token = jwt.sign({ email: user.email, id: user._id }, secret, { expiresIn: "24h" });
+  console.log("token: ", token)
+  response = {
+    token,
+    user
+  }
+  return response;
+};
+
+//googleAuthLogin
+
 export const forgotPassword = async (req: Request, res: Response) => {
   const { email } = req.body;
   const user = await doesUserExist({ email });
@@ -648,4 +671,24 @@ export const userRecord = async (req: Request, res:Response) => {
     user
   })
 
+}
+
+export const verifyTokenGoogle = async (req: Request, res: Response)=>{
+  const token = req.body.token;
+  if(!token){
+    return res.status(400).json({
+      message: "Invalid token"
+    })
+  }
+  const validate = jwt.verify(token, secret);
+  if(!validate){
+    return res.status(400).json({
+      message: "Invalid token"
+    })
+  }
+  return res.status(200).json({
+    message: "Valid Token",
+    validate
+  })
+  
 }

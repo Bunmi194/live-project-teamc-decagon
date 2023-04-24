@@ -11,7 +11,8 @@ import {
   payStackCallback,
   getTransaction,
   userRecord,
-  getAllUsersCountDetails
+  getAllUsersCountDetails,
+  verifyTokenGoogle
 } from "../controllers/userController";
 import { addDriver, sendAllDrivers, editDriverDetails, deleteDriverDetails, countDriverDetails } from "../controllers/driverController";
 import {
@@ -41,6 +42,9 @@ route.get("/", defaultController);
 route.post("/signup", signUpAuth.body, signUp);
 
 route.post("/login", loginAuth.body, login);
+
+route.post("/verifytoken", verifyTokenGoogle);
+
 
 route.get("/verify/:token", verifyEmail);
 route.get("/user/:id", userRecord);
