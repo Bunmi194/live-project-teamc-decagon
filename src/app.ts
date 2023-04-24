@@ -12,6 +12,7 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 import cors from "cors";
 import bodyParser from 'body-parser';
+import { GOOGLE_REDIRECT } from "./env";
 
 
 //import databaseConnection from "./config/config";
@@ -108,7 +109,7 @@ app.get('/google', function(req, res, next) {
     const routeOfOperation = details.user.routeOfOperation;
     const _id = details.user._id;
     //https://emove-teamc.netlify.app/#
-    res.redirect(`https://emove-teamc.netlify.app/#/auth/google/?token=${token}&dateOfBirth=${dateOfBirth}&driverStatus=${driverStatus}&email=${email}&firstName=${firstName}&gender=${gender}&isVerified=${isVerified}&lastName=${lastName}&password=encrypted&roles=${roles}&wallet_balance=${wallet_balance}&routeOfOperation=${routeOfOperation}&_id=${_id}`);
+    res.redirect(`${GOOGLE_REDIRECT}/#/auth/google/?token=${token}&dateOfBirth=${dateOfBirth}&driverStatus=${driverStatus}&email=${email}&firstName=${firstName}&gender=${gender}&isVerified=${isVerified}&lastName=${lastName}&password=encrypted&roles=${roles}&wallet_balance=${wallet_balance}&routeOfOperation=${routeOfOperation}&_id=${_id}`);
     // return res.status(200).json({message: "Success"})
   });
   //http://localhost:3000/#/auth/google
